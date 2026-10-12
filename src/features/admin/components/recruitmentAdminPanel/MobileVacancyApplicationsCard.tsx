@@ -47,20 +47,22 @@ export const MobileVacancyApplicationsCard: React.FC<
       }`}
     >
       <div className="flex justify-between items-start mb-3">
-        <div>
+        <div className="min-w-0 flex-1 pr-3">
           <h4
-            className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}
+            className={`font-medium truncate ${isDark ? 'text-white' : 'text-gray-900'}`}
+            title={application.user?.name || 'Unknown User'}
           >
             {application.user?.name || 'Unknown User'}
           </h4>
           <p
-            className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}
+            className={`text-xs break-all mt-0.5 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}
+            title={application.user?.email || application.user_id}
           >
             {application.user?.email || application.user_id}
           </p>
         </div>
         <span
-          className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium capitalize ${
+          className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium capitalize shrink-0 ${
             statusColors[application.status] || 'bg-gray-100 text-gray-800'
           }`}
         >
@@ -104,7 +106,7 @@ export const MobileVacancyApplicationsCard: React.FC<
 
         <button
           onClick={() => setMenuOpen(true)}
-          className={`p-2 rounded-lg transition-colors ${
+          className={`p-2 rounded-lg transition-colors cursor-pointer ${
             isDark
               ? 'text-gray-500 hover:text-blue-400 hover:bg-blue-400/10'
               : 'text-gray-400 hover:text-blue-500 hover:bg-blue-50'
@@ -120,7 +122,7 @@ export const MobileVacancyApplicationsCard: React.FC<
         onClose={() => setMenuOpen(false)}
         User={application?.user}
         extraDetails={application?.extra_data}
-        width="400px"
+        width="min(100vw, 420px)"
       />
     </div>
   );

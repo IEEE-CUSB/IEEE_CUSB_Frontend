@@ -1,10 +1,10 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { registerSchema } from '@/features/auth/schemas';
-import { Button, InputField, Modal, Select } from '@ieee-ui/ui';
+import { Button, InputField, PasswordField, Modal, Select } from '@ieee-ui/ui';
 import UniversityList from '@/constants/universityList';
 import FacultyList from '@/constants/facultyList';
-import DepartmentList from '@/constants/departmentList';
+import { getDepartmentsForFaculty } from '@/constants/departmentList';
 import { useTheme } from '@/shared/hooks/useTheme';
 import { useCreateUser } from '@/shared/queries/admin/index';
 
@@ -42,7 +42,9 @@ const AddUserModal = ({
     },
   });
 
-  // Watch password fields for live matching
+  // Watch fields
+  const faculty = watch('faculty');
+  const availableDepartments = getDepartmentsForFaculty(faculty);
   const password = watch('password');
   const confirmPassword = watch('confirmPassword');
   const passwordsMatch =
@@ -232,7 +234,7 @@ const AddUserModal = ({
             <Select
               id="major"
               {...registerField('major')}
-              options={DepartmentList.map((d) => ({ value: d, label: d }))}
+              options={availableDepartments.map((d) => ({ value: d, label: d }))}
               error={errors.major?.message}
               disabled={isPending}
               darkMode={isDark}
@@ -251,9 +253,8 @@ const AddUserModal = ({
             >
               Password *
             </label>
-            <InputField
+            <PasswordField
               id="password"
-              type="password"
               placeholder="Enter password"
               {...registerField('password')}
               error={errors.password?.message}
@@ -270,9 +271,8 @@ const AddUserModal = ({
             >
               Confirm Password *
             </label>
-            <InputField
+            <PasswordField
               id="confirmPassword"
-              type="password"
               placeholder="Confirm password"
               {...registerField('confirmPassword')}
               error={errors.confirmPassword?.message}

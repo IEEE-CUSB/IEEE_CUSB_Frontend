@@ -5,10 +5,10 @@ import { Link } from 'react-router-dom';
 import { FiArrowLeft } from 'react-icons/fi';
 import { registerSchema } from '@/features/auth/schemas';
 import { useRegister } from '@/shared/queries/auth';
-import { Button, InputField, Select } from '@ieee-ui/ui';
+import { Button, InputField, PasswordField, Select } from '@ieee-ui/ui';
 import UniversityList from '@/constants/universityList';
 import FacultyList from '@/constants/facultyList';
-import DepartmentList from '@/constants/departmentList';
+import { getDepartmentsForFaculty } from '@/constants/departmentList';
 import logo from '@/assets/logo.png';
 import { useTheme } from '@/shared/hooks/useTheme';
 import { VerifyEmailModal } from '@/features/auth/components/VerifyEmailModal';
@@ -49,6 +49,8 @@ export const RegisterPage = () => {
   });
 
   // Watch fields
+  const faculty = watch('faculty');
+  const availableDepartments = getDepartmentsForFaculty(faculty);
   const password = watch('password');
   const confirmPassword = watch('confirmPassword');
   const cvFile = watch('cv');
@@ -307,7 +309,7 @@ export const RegisterPage = () => {
                 <Select
                   id="major"
                   {...registerField('major')}
-                  options={DepartmentList.map(d => ({ value: d, label: d }))}
+                  options={availableDepartments.map(d => ({ value: d, label: d }))}
                   error={errors.major?.message}
                   disabled={isPending}
                   darkMode={isDark}
@@ -326,9 +328,8 @@ export const RegisterPage = () => {
                 >
                   Password *
                 </label>
-                <InputField
+                <PasswordField
                   id="password"
-                  type="password"
                   placeholder="Enter password"
                   {...registerField('password')}
                   error={errors.password?.message}
@@ -345,9 +346,8 @@ export const RegisterPage = () => {
                 >
                   Confirm Password *
                 </label>
-                <InputField
+                <PasswordField
                   id="confirmPassword"
-                  type="password"
                   placeholder="Confirm password"
                   {...registerField('confirmPassword')}
                   error={errors.confirmPassword?.message}

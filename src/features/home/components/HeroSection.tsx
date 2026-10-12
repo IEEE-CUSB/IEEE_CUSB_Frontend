@@ -31,15 +31,15 @@ export const HeroSection = ({
   );
 
   const ctaContent = (
-    <div className="flex items-center gap-4">
-      <Link to="/join">
+    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
+      <Link to="/join" className="w-full sm:w-auto">
         <motion.div
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="inline-flex items-center gap-3 bg-primary text-primary-foreground px-6 py-3 rounded-full font-semibold hover:bg-primary/90 transition-all shadow-xl hover:shadow-2xl group"
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-primary text-primary-foreground px-6 py-3.5 rounded-full font-semibold hover:bg-primary/90 transition-all shadow-xl hover:shadow-2xl group text-center"
         >
           <span>Join IEEE CUSB</span>
-          <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:rotate-45 transition-transform duration-300">
+          <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:rotate-45 transition-transform duration-300 shrink-0">
             <svg
               className="w-4 h-4 text-white"
               fill="none"
@@ -57,11 +57,11 @@ export const HeroSection = ({
         </motion.div>
       </Link>
 
-      <Link to="/about">
+      <Link to="/about" className="w-full sm:w-auto">
         <motion.div
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold border border-border text-foreground hover:bg-surface transition-all"
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full font-semibold border border-border text-foreground hover:bg-surface transition-all text-center"
         >
           Learn More
         </motion.div>
@@ -71,7 +71,7 @@ export const HeroSection = ({
 
   const bottomSection = (
     <>
-      <div className="flex gap-4">
+      <div className="flex flex-col md:flex-row gap-3 md:gap-4">
         <FeatureCard
           variant="main"
           title="Student Community"
@@ -124,9 +124,9 @@ export const HeroSection = ({
       bottomContent={bottomSection}
       backgroundContent={backgrounds}
       className="min-h-screen flex-col overflow-hidden bg-background !pt-0 !pb-0 !px-0 flex md:!items-center"
-      containerClassName="flex-1 flex flex-col justify-center px-6 pt-24 pb-12 md:pt-32 md:pb-16"
-      titleClassName="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6"
-      descriptionClassName="text-base md:text-lg text-text-muted leading-relaxed"
+      containerClassName="flex-1 flex flex-col justify-center px-4 sm:px-6 pt-20 pb-10 md:pt-32 md:pb-16"
+      titleClassName="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4 sm:mb-6"
+      descriptionClassName="text-sm sm:text-base md:text-lg text-text-muted leading-relaxed"
       showDotGrid={false}
     />
   );

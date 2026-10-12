@@ -6,7 +6,7 @@ import { FiArrowLeft, FiCheckCircle, FiMail, FiLock } from 'react-icons/fi';
 import { useTheme } from '@/shared/hooks/useTheme';
 import { useSendPasswordOTP, useResetPassword, useCheckPasswordOTP } from '@/shared/queries/auth';
 import { OtpInput } from './OtpInput';
-import { InputField, Button } from '@ieee-ui/ui';
+import { InputField, PasswordField, Button } from '@ieee-ui/ui';
 
 // ── Schemas ──────────────────────────────────────────────────────────────────
 
@@ -267,9 +267,8 @@ export const ForgotPasswordPanel = ({ onClose }: ForgotPasswordPanelProps) => {
       {/* New password */}
       <div>
         {label('New password')}
-        <InputField
+        <PasswordField
           id="fp-password"
-          type="password"
           placeholder="Min 8 chars, mixed case + symbol"
           {...resetForm.register('password')}
           error={resetForm.formState.errors.password?.message}
@@ -279,9 +278,8 @@ export const ForgotPasswordPanel = ({ onClose }: ForgotPasswordPanelProps) => {
 
       <div>
         {label('Confirm new password')}
-        <InputField
+        <PasswordField
           id="fp-confirm"
-          type="password"
           placeholder="Repeat new password"
           {...resetForm.register('confirmPassword')}
           error={resetForm.formState.errors.confirmPassword?.message}

@@ -125,18 +125,20 @@ export const VacancyApplicationsModal = ({
       {
         header: 'Applicant',
         cell: item => (
-          <div className="flex flex-col">
+          <div className="flex flex-col min-w-0 max-w-[240px]">
             <span
-              className={`font-medium ${
+              className={`font-medium truncate ${
                 isDark ? 'text-white' : 'text-gray-900'
               }`}
+              title={item.user?.name || 'Unknown User'}
             >
               {item.user?.name || 'Unknown User'}
             </span>
             <span
-              className={`text-xs ${
+              className={`text-xs truncate ${
                 isDark ? 'text-gray-400' : 'text-gray-500'
               }`}
+              title={item.user?.email || item.user_id}
             >
               {item.user?.email || item.user_id}
             </span>

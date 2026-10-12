@@ -29,5 +29,24 @@ const DepartmentList = [
   'Water Engineering and Environment (WEE)',
   'Preparatory year',
 ];
+export const CSDepartmentList = [
+  'Data Science',
+  'Cybersecurity',
+  'Software Engineering',
+  'Information Technology',
+  'Artificial Intelligence',
+  'Decision Support',
+  'Computer Science',
+  'Information Systems',
+];
+
+export const getDepartmentsForFaculty = (faculty?: string): string[] => {
+  if (!faculty) return DepartmentList;
+  const normalized = faculty.trim().toLowerCase();
+  if (normalized === 'computer science' || normalized.includes('computer science')) {
+    return CSDepartmentList;
+  }
+  return DepartmentList;
+};
 
 export default DepartmentList;

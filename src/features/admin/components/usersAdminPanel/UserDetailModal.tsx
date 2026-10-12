@@ -92,13 +92,13 @@ export const UserDetailModal = ({
       <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
         <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-background px-6 py-8">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-5">
-              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary text-2xl font-semibold text-primary-foreground">
+            <div className="flex items-center gap-4 sm:gap-5 min-w-0">
+              <div className="flex h-16 w-16 sm:h-20 sm:w-20 shrink-0 items-center justify-center rounded-full bg-primary text-xl sm:text-2xl font-semibold text-primary-foreground">
                 {initials}
               </div>
-              <div>
-                <h3 className="text-2xl font-semibold text-foreground">{user.name}</h3>
-                <p className="mt-1 text-sm text-muted-foreground">@{user.username}</p>
+              <div className="min-w-0">
+                <h3 className="text-xl sm:text-2xl font-semibold text-foreground truncate" title={user.name}>{user.name}</h3>
+                <p className="mt-1 text-sm text-muted-foreground truncate" title={`@${user.username}`}>@{user.username}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -136,20 +136,69 @@ export const UserDetailModal = ({
             </div>
 
             <div className="rounded-2xl border border-border bg-background/70 p-5">
-              <div className="flex items-center gap-2 text-lg font-semibold text-foreground">
-                <FiAward className="h-5 w-5 text-primary" />
+              <div className="flex items-center gap-2 text-base sm:text-lg font-semibold text-foreground">
+                <FiAward className="h-5 w-5 text-primary shrink-0" />
                 Account details
               </div>
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                {details.map(({ label, value: detailValue, icon: Icon }) => (
-                  <div key={label} className="rounded-xl border border-border bg-background px-3 py-3">
-                    <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-                      <Icon className="h-4 w-4 text-primary" />
-                      {label}
+                {details.map(({ label, value: detailValue, icon: Icon }) => {
+                  const displayVal = value(detailValue);
+                  const isEmail = label.toLowerCase() === 'email' && Boolean(detailValue);
+                  const isPhone = label.toLowerCase() === 'phone' && Boolean(detailValue);
+
+                  return (
+                    <div
+                      key={label}
+                      className="group relative min-w-0 overflow-hidden rounded-xl border border-border bg-card/60 p-3.5 transition-all hover:border-primary/30 hover:bg-card/90"
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                          <Icon className="h-3.5 w-3.5 text-primary shrink-0" />
+                          <span>{label}</span>
+                        </div>
+                        {(isEmail || isPhone) && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              navigator.clipboard.writeText(String(detailValue));
+                              toast.success(`${label} copied!`);
+                            }}
+                            className="opacity-0 group-hover:opacity-100 transition-opacity text-xs text-primary hover:underline p-0.5 rounded cursor-pointer"
+                            title={`Copy ${label}`}
+                          >
+                            Copy
+                          </button>
+                        )}
+                      </div>
+                      <div className="mt-2 min-w-0">
+                        {isEmail ? (
+                          <a
+                            href={`mailto:${detailValue}`}
+                            className="block text-sm font-medium text-primary hover:underline break-all"
+                            title={String(detailValue)}
+                          >
+                            {displayVal}
+                          </a>
+                        ) : isPhone ? (
+                          <a
+                            href={`tel:${detailValue}`}
+                            className="block text-sm font-medium text-foreground hover:text-primary transition-colors break-all"
+                            title={String(detailValue)}
+                          >
+                            {displayVal}
+                          </a>
+                        ) : (
+                          <p
+                            className="text-sm font-medium text-foreground break-words"
+                            title={String(detailValue || '')}
+                          >
+                            {displayVal}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                    <p className="mt-2 text-sm text-muted-foreground">{value(detailValue)}</p>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>

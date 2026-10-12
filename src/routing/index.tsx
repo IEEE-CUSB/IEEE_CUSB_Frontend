@@ -62,23 +62,23 @@ const routes: RouteObject[] = [
       },
       {
         path: 'events',
-        element: <AdminEventsPage />, // Events - Working
+        element: <UnderConstructionPage />, // Events - Working
       },
       {
         path: 'committees',
-        element: <AdminCommittees />, // Events - Working
+        element: <UnderConstructionPage />, // Events - Working
       },
       {
         path: 'awards',
-        element: <AdminAwardsPage />, // Awards - Working
+        element: <UnderConstructionPage />, // Awards - Working
       },
       {
         path: 'workshops',
-        element: <AdminWorkshopsPage />, // Workshops - Working
+        element: <UnderConstructionPage />, // Workshops - Working
       },
       {
         path: 'users',
-        element: <AdminUsersPage />, // Users - Working
+        element: <UnderConstructionPage />, // Users - Working
       },
       {
         path: 'recruitment',

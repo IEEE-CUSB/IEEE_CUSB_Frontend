@@ -51,7 +51,7 @@ export const PageHeroSection = ({
   descriptionClassName,
   showDotGrid = true,
 }: PageHeroSectionProps) => {
-  const sectionBaseClass = `relative px-6 pt-16 pb-8 md:flex md:items-center md:-mt-32 ${
+  const sectionBaseClass = `relative px-4 sm:px-6 pt-16 pb-8 md:flex md:items-center md:-mt-32 ${
     className ?? 'bg-background md:h-[60vh]'
   }`;
 
@@ -82,7 +82,7 @@ export const PageHeroSection = ({
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.4, ease: [0.4, 0, 0.2, 1] }}
-        className={`text-4xl md:text-5xl lg:text-6xl font-bold leading-[1.1] mb-6 ${
+        className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-[1.15] mb-4 sm:mb-6 ${
           titleClassName ?? 'text-foreground max-w-3xl'
         }`}
       >
@@ -128,7 +128,7 @@ export const PageHeroSection = ({
         )}
 
         {layout === 'split-text' && (
-          <div className="grid lg:grid-cols-2 gap-8 mb-8">
+          <div className="grid lg:grid-cols-2 gap-6 lg:gap-8 mb-6 lg:mb-8">
             <div>{renderTextContent(true)}</div>
             <div className="flex flex-col justify-center">
               {description && (
