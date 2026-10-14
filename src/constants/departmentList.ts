@@ -43,7 +43,11 @@ export const CSDepartmentList = [
 export const getDepartmentsForFaculty = (faculty?: string): string[] => {
   if (!faculty) return DepartmentList;
   const normalized = faculty.trim().toLowerCase();
-  if (normalized === 'computer science' || normalized.includes('computer science')) {
+  if (
+    normalized.includes('computer') ||
+    normalized.includes('artificial intelligence') ||
+    normalized.includes('information technology')
+  ) {
     return CSDepartmentList;
   }
   return DepartmentList;
