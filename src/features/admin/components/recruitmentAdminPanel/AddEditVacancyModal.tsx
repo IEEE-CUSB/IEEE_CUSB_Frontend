@@ -115,6 +115,44 @@ export const AddEditVacancyModal: React.FC<ExtendedAddEditVacancyModalProps> = (
   const [errors, setErrors] = useState<Errs>({});
   const [isSaving, setIsSaving] = useState(false);
 
+  // Custom Quill modules to toggle link tooltip and ensure clean options
+  const quillModules = React.useMemo(
+    () => ({
+      toolbar: {
+        container: [
+          [{ header: ['1', '2', '3', false] }],
+          ['bold', 'italic', 'underline', 'strike'],
+          [{ list: 'ordered' }, { list: 'bullet' }],
+          ['link', 'clean'],
+        ],
+        handlers: {
+          link: function (this: { quill: any }) {
+            const tooltip = this.quill.theme?.tooltip;
+            if (!tooltip) return;
+
+            // If already open, clicking link button toggles it closed
+            if (!tooltip.root.classList.contains('ql-hidden')) {
+              tooltip.hide();
+              return;
+            }
+
+            let range = this.quill.getSelection();
+            if (!range) {
+              this.quill.focus();
+              range = this.quill.getSelection();
+            }
+            const preview =
+              range && range.length > 0
+                ? this.quill.getText(range.index, range.length)
+                : '';
+            tooltip.edit('link', preview);
+          },
+        },
+      },
+    }),
+    []
+  );
+
   // Reset when modal opens / vacancy changes
   React.useEffect(() => {
     setFormKey(prev => prev + 1);
@@ -349,12 +387,17 @@ export const AddEditVacancyModal: React.FC<ExtendedAddEditVacancyModalProps> = (
             <label className={`block text-sm font-medium mb-1.5 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
               Description
             </label>
-            <div className={`react-quill-wrapper ${isDark ? 'dark-mode-quill' : ''}`}>
+            <div
+              id="vacancy-description-quill"
+              className={`react-quill-wrapper ${isDark ? 'dark-mode-quill' : ''}`}
+            >
               <ReactQuill
                 theme="snow"
+                bounds="#vacancy-description-quill"
+                modules={quillModules}
                 value={formValues.description}
                 onChange={handleDescriptionChange}
-                style={{ backgroundColor: isDark ? '#374151' : '#fff', color: isDark ? '#fff' : '#000', borderRadius: '8px' }}
+                placeholder="Write a clear and detailed description of the vacancy..."
               />
             </div>
             {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}

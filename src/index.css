@@ -265,12 +265,122 @@
   }
 }
 
+/* React Quill Layout & Customizations */
+.react-quill-wrapper {
+  position: relative;
+}
+
+.react-quill-wrapper .ql-toolbar.ql-snow {
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+  border-color: var(--color-border, #d1d5db);
+}
+
+.react-quill-wrapper .ql-container.ql-snow {
+  border-bottom-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+  border-color: var(--color-border, #d1d5db);
+  min-height: 140px;
+  font-family: inherit;
+  font-size: 0.875rem;
+}
+
+.react-quill-wrapper .ql-editor {
+  min-height: 140px;
+}
+
+/* Ensure hidden tooltips are ALWAYS hidden, preventing stuck popups */
+.react-quill-wrapper .ql-snow .ql-tooltip.ql-hidden,
+.ql-snow .ql-tooltip.ql-hidden {
+  display: none !important;
+}
+
+/* Ensure Quill link tooltip never clips outside container/modal */
+.react-quill-wrapper .ql-snow .ql-tooltip {
+  z-index: 50 !important;
+  max-width: calc(100% - 16px) !important;
+  box-sizing: border-box !important;
+  border-radius: 0.5rem !important;
+  padding: 8px 12px !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1) !important;
+  background-color: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+  color: #1f2937 !important;
+}
+
+/* Flexible, wrapping layout ONLY when editing and NOT hidden */
+.react-quill-wrapper .ql-snow .ql-tooltip.ql-editing:not(.ql-hidden) {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 8px !important;
+  white-space: normal !important;
+}
+
+.react-quill-wrapper .ql-snow .ql-tooltip.ql-editing:not(.ql-hidden)::before {
+  line-height: normal !important;
+  margin-right: 0 !important;
+  font-weight: 500 !important;
+  font-size: 0.8125rem !important;
+  color: #4b5563 !important;
+}
+
+.react-quill-wrapper .ql-snow .ql-tooltip.ql-editing:not(.ql-hidden) input[type="text"] {
+  display: inline-block !important;
+  flex: 1 1 140px !important;
+  min-width: 100px !important;
+  max-width: 100% !important;
+  height: 30px !important;
+  border-radius: 0.375rem !important;
+  border: 1px solid #d1d5db !important;
+  background-color: #ffffff !important;
+  color: #111827 !important;
+  padding: 4px 8px !important;
+  font-size: 0.8125rem !important;
+  outline: none !important;
+}
+
+.react-quill-wrapper .ql-snow .ql-tooltip.ql-editing:not(.ql-hidden) input[type="text"]:focus {
+  border-color: #00529b !important;
+  box-shadow: 0 0 0 1px #00529b !important;
+}
+
+.react-quill-wrapper .ql-snow .ql-tooltip a.ql-action {
+  font-size: 0.8125rem !important;
+  line-height: normal !important;
+  cursor: pointer !important;
+  font-weight: 600 !important;
+  color: #00529b !important;
+}
+
+/* Show cancel button when editing so the user can easily close the tooltip */
+.react-quill-wrapper .ql-snow .ql-tooltip.ql-editing:not(.ql-hidden) a.ql-remove {
+  display: inline-block !important;
+  font-size: 0.8125rem !important;
+  line-height: normal !important;
+  cursor: pointer !important;
+  font-weight: 500 !important;
+  color: #dc2626 !important;
+  margin-left: 6px !important;
+}
+
+.react-quill-wrapper .ql-snow .ql-tooltip.ql-editing:not(.ql-hidden) a.ql-remove::before {
+  content: 'Cancel' !important;
+  margin-left: 0 !important;
+}
+
+.react-quill-wrapper .ql-snow .ql-tooltip:not(.ql-editing) a.ql-remove {
+  color: #dc2626 !important;
+  font-size: 0.8125rem !important;
+  cursor: pointer !important;
+}
+
 /* React Quill Dark Mode */
-.dark-mode-quill .ql-toolbar {
+.dark-mode-quill .ql-toolbar.ql-snow {
   background-color: var(--color-background-light);
   border-color: var(--color-border);
 }
-.dark-mode-quill .ql-container {
+.dark-mode-quill .ql-container.ql-snow {
   background-color: var(--color-background);
   border-color: var(--color-border);
   color: var(--color-text-primary);
@@ -287,7 +397,43 @@
 .dark-mode-quill .ql-toolbar .ql-picker-options {
   background-color: var(--color-background-light);
   border-color: var(--color-border);
+  color: var(--color-text-primary);
 }
 .dark-mode-quill .ql-editor.ql-blank::before {
   color: var(--color-text-muted);
+}
+
+.dark-mode-quill .ql-snow .ql-tooltip {
+  background-color: #1f2937 !important;
+  border-color: #374151 !important;
+  color: #f3f4f6 !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5) !important;
+}
+
+.dark-mode-quill .ql-snow .ql-tooltip.ql-editing:not(.ql-hidden)::before {
+  color: #9ca3af !important;
+}
+
+.dark-mode-quill .ql-snow .ql-tooltip.ql-editing:not(.ql-hidden) input[type="text"] {
+  background-color: #111827 !important;
+  border-color: #4b5563 !important;
+  color: #f9fafb !important;
+}
+
+.dark-mode-quill .ql-snow .ql-tooltip.ql-editing:not(.ql-hidden) input[type="text"]:focus {
+  border-color: #38bdf8 !important;
+  box-shadow: 0 0 0 1px #38bdf8 !important;
+}
+
+.dark-mode-quill .ql-snow .ql-tooltip a.ql-action {
+  color: #38bdf8 !important;
+}
+
+.dark-mode-quill .ql-snow .ql-tooltip.ql-editing:not(.ql-hidden) a.ql-remove,
+.dark-mode-quill .ql-snow .ql-tooltip:not(.ql-editing) a.ql-remove {
+  color: #f87171 !important;
+}
+
+.dark-mode-quill .ql-snow .ql-tooltip a.ql-preview {
+  color: #7dd3fc !important;
 }
