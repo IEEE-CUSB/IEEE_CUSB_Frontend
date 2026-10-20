@@ -58,19 +58,19 @@ export const SponsorsMarquee = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 1.2 }}
-      className="relative flex w-full flex-col items-center justify-center overflow-hidden mt-8"
+      className="relative flex w-full flex-col items-center justify-center overflow-hidden mt-6 md:mt-8"
     >
-      <p className="text-center text-xs font-semibold tracking-widest text-text-muted/60 uppercase mb-4">
+      <p className="text-center text-xs font-semibold tracking-widest text-text-muted/60 uppercase mb-3 md:mb-4">
         Trusted by leading organizations
       </p>
 
-      <Marquee pauseOnHover className="[--duration:35s] py-4">
+      <Marquee pauseOnHover className="[--duration:35s] py-3 md:py-4">
         {sponsors.map(sponsor => (
           <img
             key={sponsor.name}
             src={sponsor.src}
             alt={`${sponsor.name} logo`}
-            className="h-14 md:h-16 w-32 md:w-48 object-contain select-none pointer-events-none transition-[filter,opacity] duration-300"
+            className="h-10 sm:h-14 md:h-16 w-24 sm:w-32 md:w-48 object-contain select-none pointer-events-none transition-[filter,opacity] duration-300 mx-1 sm:mx-2"
             style={getLogoStyle(sponsor.filter, isDark)}
             draggable={false}
             loading="lazy"

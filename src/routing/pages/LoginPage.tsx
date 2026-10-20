@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { FiArrowLeft } from 'react-icons/fi';
 import { loginSchema, type LoginFormData } from '@/features/auth/schemas';
 import { useLogin } from '@/shared/queries/auth';
-import { Button, InputField } from '@ieee-ui/ui';
+import { Button, InputField, PasswordField } from '@ieee-ui/ui';
 import logo from '@/assets/logo.png';
 import { useTheme } from '@/shared/hooks/useTheme';
 import { ForgotPasswordPanel } from '@/features/auth/components/ForgotPasswordPanel';
@@ -129,9 +129,8 @@ export const LoginPage = () => {
                   >
                     Password
                   </label>
-                  <InputField
+                  <PasswordField
                     id="password"
-                    type="password"
                     placeholder="Enter your password"
                     {...register('password')}
                     error={errors.password?.message}

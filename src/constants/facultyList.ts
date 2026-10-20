@@ -1,10 +1,8 @@
 const FacultyList = [
-    "Engineering",
-    "Artificial Intelligence",
-    "Computer Science", 
-    "Information Technology",
-    "Business Administration",
-    "Not Specified"
+  'Engineering',
+  'Faculty of Computer Science and Artificial Intelligence',
+  'Business Administration',
+  'Not Specified',
 ];
 
 export default FacultyList;

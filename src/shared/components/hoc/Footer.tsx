@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { FaFacebookF, FaLinkedinIn } from 'react-icons/fa';
+import { MapPin, Mail } from 'lucide-react';
 import logoImage from '@/assets/logo.jpg';
 import { useTheme } from '@/shared/hooks/useTheme';
 
@@ -147,13 +148,13 @@ export const Footer = () => {
           >
             Contact Us
           </h3>
-          <ul className="space-y-2 text-sm">
-            <li className="flex items-start gap-2">
-              <span>📍</span>
+          <ul className="space-y-3 text-sm">
+            <li className="flex items-start gap-2.5">
+              <MapPin className="w-4 h-4 text-primary shrink-0 mt-0.5" />
               <span>Faculty of Engineering, Cairo University, Giza, Egypt</span>
             </li>
-            <li className="flex items-start gap-2">
-              <span>📧</span>
+            <li className="flex items-center gap-2.5">
+              <Mail className="w-4 h-4 text-primary shrink-0" />
               <a
                 href="mailto:contact@ieeecusb.org"
                 className="hover:text-primary transition-colors"

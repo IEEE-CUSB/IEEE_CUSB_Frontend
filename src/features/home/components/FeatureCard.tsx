@@ -155,11 +155,11 @@ export const FeatureCard = ({
       }}
       onClick={() => onExpand(index)}
       className={`
-        group relative overflow-hidden rounded-3xl cursor-pointer
-        ${isExpanded ? 'flex-[3]' : 'flex-1'}
-        h-[280px]
-        transition-all duration-700 ease-out
-        shadow-xl ${isExpanded ? 'shadow-2xl' : ''}
+        group relative overflow-hidden rounded-2xl md:rounded-3xl cursor-pointer
+        ${isExpanded ? 'md:flex-[3]' : 'md:flex-1'}
+        ${isExpanded ? 'h-auto min-h-[190px] md:h-[280px]' : 'h-[64px] md:h-[280px]'}
+        transition-all duration-500 ease-out
+        shadow-md md:shadow-xl ${isExpanded ? 'shadow-xl' : ''}
       `}
     >
       {/* Flowing wave background */}
@@ -173,7 +173,7 @@ export const FeatureCard = ({
             animate={{ opacity: 0.1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
             transition={{ duration: 0.5 }}
-            className="absolute top-8 right-8 text-[200px] text-white"
+            className="absolute top-4 right-4 md:top-8 md:right-8 text-7xl md:text-[200px] text-white pointer-events-none"
           >
             {icon}
           </motion.div>
@@ -181,32 +181,52 @@ export const FeatureCard = ({
       </AnimatePresence>
 
       {/* Content with smooth transitions - Fixed positioning */}
-      <div className="absolute inset-0 p-6 flex items-center justify-center">
+      <div className="absolute inset-0 p-4 md:p-6 flex items-center justify-center">
         <AnimatePresence mode="wait">
           {!isExpanded ? (
-            // Vertical title when inactive
-            <motion.div
-              key="vertical"
-              initial={{ opacity: 0, rotateZ: 0 }}
-              animate={{ opacity: 1, rotateZ: 0 }}
-              exit={{ opacity: 0, rotateZ: 90 }}
-              transition={{ duration: 0.5, ease: [0.4, 0.0, 0.2, 1] }}
-              className="flex items-center justify-center"
-            >
-              <motion.h3
+            <>
+              {/* Inactive card on mobile */}
+              <motion.div
+                key="inactive-mobile"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.3 }}
-                className={`text-2xl font-bold transition-colors duration-300 ${darkMode ? 'text-white/70' : 'text-white'}`}
-                style={{
-                  writingMode: 'vertical-rl',
-                  transform: 'rotate(180deg)',
-                }}
+                className="flex md:hidden w-full h-full items-center justify-between px-2 text-white"
               >
-                {title}
-              </motion.h3>
-            </motion.div>
+                <div className="flex items-center gap-3">
+                  {icon && <span className="text-xl opacity-90">{icon}</span>}
+                  <span className="text-base font-bold">{title}</span>
+                </div>
+                <span className="text-[11px] font-semibold opacity-80 bg-white/15 px-2.5 py-1 rounded-full">
+                  Tap to view
+                </span>
+              </motion.div>
+
+              {/* Vertical title when inactive on desktop */}
+              <motion.div
+                key="vertical-desktop"
+                initial={{ opacity: 0, rotateZ: 0 }}
+                animate={{ opacity: 1, rotateZ: 0 }}
+                exit={{ opacity: 0, rotateZ: 90 }}
+                transition={{ duration: 0.5, ease: [0.4, 0.0, 0.2, 1] }}
+                className="hidden md:flex items-center justify-center"
+              >
+                <motion.h3
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className={`text-2xl font-bold transition-colors duration-300 ${darkMode ? 'text-white/70' : 'text-white'}`}
+                  style={{
+                    writingMode: 'vertical-rl',
+                    transform: 'rotate(180deg)',
+                  }}
+                >
+                  {title}
+                </motion.h3>
+              </motion.div>
+            </>
           ) : (
             // Horizontal layout when active
             <motion.div
@@ -215,22 +235,25 @@ export const FeatureCard = ({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.5, ease: [0.4, 0.0, 0.2, 1] }}
-              className="w-full h-full flex flex-col justify-between"
+              className="w-full h-full flex flex-col justify-between py-1 md:py-0"
             >
               <div>
-                <motion.h3
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: 0.1 }}
-                  className="text-2xl font-bold text-white mb-4"
-                >
-                  {title}
-                </motion.h3>
+                <div className="flex items-center gap-2 mb-2 md:mb-4">
+                  {icon && <span className="text-2xl text-white/90 md:hidden">{icon}</span>}
+                  <motion.h3
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.1 }}
+                    className="text-xl md:text-2xl font-bold text-white"
+                  >
+                    {title}
+                  </motion.h3>
+                </div>
                 <motion.p
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: 0.2 }}
-                  className="text-gray-100 leading-relaxed"
+                  className="text-sm md:text-base text-gray-100 leading-relaxed pr-6 md:pr-0"
                 >
                   {description}
                 </motion.p>
@@ -240,7 +263,7 @@ export const FeatureCard = ({
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
-                className="mt-auto origin-left"
+                className="mt-3 md:mt-auto origin-left"
               >
                 <div className="h-1 bg-white rounded-full w-full" />
               </motion.div>

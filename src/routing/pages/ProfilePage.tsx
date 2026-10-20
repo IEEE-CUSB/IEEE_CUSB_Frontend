@@ -28,6 +28,8 @@ import { usersApi, useDeleteCv, useUploadCv, useGetUserApplications } from '@/sh
 import { useEvents } from '@/shared/queries/events/events.queries';
 import { useWorkshops } from '@/shared/queries/workshops/workshops.queries';
 import { useGetVacancies } from '@/shared/queries/recruitment';
+import FacultyList from '@/constants/facultyList';
+import { getDepartmentsForFaculty } from '@/constants/departmentList';
 import toast from 'react-hot-toast';
 
 const formatValue = (value: string | number | boolean | null | undefined) => {
@@ -98,7 +100,7 @@ export const ProfilePage = () => {
   };
 
   const handleInputChange = (
-    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = event.target;
     setFormData(prev => ({
@@ -106,6 +108,8 @@ export const ProfilePage = () => {
       [name]: name === 'academic_year' ? Number(value) : value,
     }));
   };
+
+  const availableDepartments = getDepartmentsForFaculty(formData.faculty);
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
@@ -492,13 +496,23 @@ export const ProfilePage = () => {
 
                 <label className="block text-sm font-medium text-foreground">
                   <span className="mb-2 block">Faculty</span>
-                  <input
+                  <select
                     name="faculty"
                     value={formData.faculty}
                     onChange={handleInputChange}
-                    className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none ring-0"
+                    className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none ring-0 text-foreground cursor-pointer"
                     required
-                  />
+                  >
+                    <option value="" disabled>Select faculty</option>
+                    {FacultyList.map(f => (
+                      <option key={f} value={f}>
+                        {f}
+                      </option>
+                    ))}
+                    {formData.faculty && !FacultyList.includes(formData.faculty) && (
+                      <option value={formData.faculty}>{formData.faculty}</option>
+                    )}
+                  </select>
                 </label>
 
                 <label className="block text-sm font-medium text-foreground">
@@ -527,13 +541,23 @@ export const ProfilePage = () => {
                 </label>
 
                 <label className="block text-sm font-medium text-foreground">
-                  <span className="mb-2 block">Major</span>
-                  <input
+                  <span className="mb-2 block">Department (Major)</span>
+                  <select
                     name="major"
                     value={formData.major}
                     onChange={handleInputChange}
-                    className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none ring-0"
-                  />
+                    className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none ring-0 text-foreground cursor-pointer"
+                  >
+                    <option value="">Select department</option>
+                    {availableDepartments.map(d => (
+                      <option key={d} value={d}>
+                        {d}
+                      </option>
+                    ))}
+                    {formData.major && !availableDepartments.includes(formData.major) && (
+                      <option value={formData.major}>{formData.major}</option>
+                    )}
+                  </select>
                 </label>
               </div>
 
