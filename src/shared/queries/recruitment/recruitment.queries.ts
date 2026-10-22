@@ -57,7 +57,7 @@ export const useUpdateVacancies = () => {
         queryKey: QUERY_KEYS.RECRUITMENT.ADMIN_VACANCIES,
       });
 
-      if (variables.data?.is_open) {
+      if (variables.data?.is_open !== undefined) {
         queryClient.invalidateQueries({
           queryKey: QUERY_KEYS.RECRUITMENT.VACANCIES,
         });

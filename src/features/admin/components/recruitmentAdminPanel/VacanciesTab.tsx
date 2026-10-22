@@ -21,6 +21,7 @@ import {
 import { AddEditVacancyModal } from './AddEditVacancyModal';
 import { VacancyApplicationsModal } from './VacancyApplicationsModal';
 import { stripHtmlToText } from '@/shared/utils/helpers';
+import { Toggle } from '@/shared/components/ui/Toggle';
 
 const VacanciesTab = () => {
   const { isDark } = useTheme();
@@ -94,25 +95,45 @@ const VacanciesTab = () => {
     }
   };
 
+  const [togglingId, setTogglingId] = useState<string | null>(null);
+
+  const handleToggleStatus = async (vacancy: Vacancy) => {
+    try {
+      setTogglingId(vacancy.id);
+      await updateMutation.mutateAsync({
+        id: vacancy.id,
+        data: { is_open: !vacancy.is_open },
+      });
+    } catch {
+      // Error is handled by updateMutation onError toast
+    } finally {
+      setTogglingId(null);
+    }
+  };
+
   const columns = useMemo<ColumnDef<Vacancy>[]>(
     () => [
       {
         header: 'Vacancy Title',
         accessorKey: 'title',
+        className: 'w-[40%] min-w-[280px]',
         cell: item => (
           <div className="flex items-center gap-3">
             {item.image_url ? (
               <img
                 src={item.image_url}
                 alt={item.title}
-                className="w-8 h-8 rounded-lg object-cover flex-shrink-0"
+                className="w-9 h-9 rounded-lg object-cover flex-shrink-0"
               />
             ) : (
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${isDark ? 'bg-primary/20' : 'bg-primary/10'}`}>
+              <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${isDark ? 'bg-primary/20' : 'bg-primary/10'}`}>
                 <CgWorkAlt className={`w-4 h-4 ${isDark ? 'text-primary-light' : 'text-primary'}`} />
               </div>
             )}
-            <span className={`font-medium max-w-[180px] truncate ${isDark ? 'text-white' : 'text-gray-900'}`}>
+            <span
+              className={`font-medium truncate ${isDark ? 'text-white' : 'text-gray-900'}`}
+              title={item.title}
+            >
               {item.title}
             </span>
           </div>
@@ -143,45 +164,26 @@ const VacanciesTab = () => {
           </span>
         ),
       },
-
-      {
-        header: 'Last Updated',
-        accessorKey: 'updated_at',
-        cell: item => (
-          <span
-            className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}
-          >
-            {new Date(item.updated_at).toLocaleString(undefined, {
-              month: 'short',
-              day: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit',
-            })}
-          </span>
-        ),
-      },
       {
         header: 'Status',
         accessorKey: 'is_open',
+        className: 'w-[160px]',
         cell: item => {
-          let statusText = 'Open';
-          let statusColor = isDark
-            ? 'bg-green-900/30 text-green-300'
-            : 'bg-green-50 text-green-600';
-
-          if (!item.is_open) {
-            statusText = 'Closed';
-            statusColor = isDark
-              ? 'bg-gray-800 text-gray-300'
-              : 'bg-gray-100 text-gray-600';
-          }
-
+          const isToggling = togglingId === item.id;
           return (
-            <span
-              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColor}`}
-            >
-              {statusText}
-            </span>
+            <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
+              <Toggle
+                size="sm"
+                checked={Boolean(item.is_open)}
+                onChange={() => handleToggleStatus(item)}
+                disabled={isToggling}
+                labelOn="Open"
+                labelOff="Closed"
+              />
+              {isToggling && (
+                <div className="w-3.5 h-3.5 border-2 border-primary border-t-transparent rounded-full animate-spin flex-shrink-0" />
+              )}
+            </div>
           );
         },
       },
@@ -227,7 +229,7 @@ const VacanciesTab = () => {
         ),
       },
     ],
-    [isDark]
+    [isDark, togglingId]
   );
   return (
     <div className="space-y-6">

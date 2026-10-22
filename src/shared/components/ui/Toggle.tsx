@@ -19,7 +19,14 @@ interface ToggleProps {
   /** Manually override dark mode (reads from theme context by default) */
   darkMode?: boolean;
   disabled?: boolean;
+  size?: 'sm' | 'md' | 'lg';
 }
+
+const SIZE_FONT_SIZES = {
+  sm: 11,
+  md: 17,
+  lg: 20,
+};
 
 export const Toggle: React.FC<ToggleProps> = ({
   checked,
@@ -31,9 +38,11 @@ export const Toggle: React.FC<ToggleProps> = ({
   className = '',
   darkMode,
   disabled = false,
+  size = 'md',
 }) => {
   const { isDark } = useTheme();
   const dark = darkMode !== undefined ? darkMode : isDark;
+  const currentFontSize = SIZE_FONT_SIZES[size] || 17;
 
   const resolvedLabel = checked
     ? (labelOn ?? label)
@@ -44,11 +53,11 @@ export const Toggle: React.FC<ToggleProps> = ({
     : (dark ? 'text-gray-400' : 'text-gray-500');
 
   return (
-    <div className={`flex items-center gap-3 ${disabled ? 'opacity-50 pointer-events-none' : ''} ${className}`}>
+    <div className={`flex items-center gap-2.5 ${disabled ? 'opacity-50 pointer-events-none' : ''} ${className}`}>
       {/* Switch wrapper */}
       <label
-        className="relative inline-block cursor-pointer select-none"
-        style={{ fontSize: 17, width: '3.5em', height: '2em' }}
+        className="relative inline-block cursor-pointer select-none flex-shrink-0"
+        style={{ fontSize: currentFontSize, width: '3.5em', height: '2em' }}
       >
         <input
           type="checkbox"
@@ -84,7 +93,7 @@ export const Toggle: React.FC<ToggleProps> = ({
       {/* Dynamic label */}
       {resolvedLabel && (
         <span
-          className={`text-sm font-semibold cursor-pointer ${labelColor}`}
+          className={`${size === 'sm' ? 'text-xs' : 'text-sm'} font-semibold cursor-pointer select-none ${labelColor}`}
           onClick={() => !disabled && onChange(!checked)}
         >
           {resolvedLabel}
