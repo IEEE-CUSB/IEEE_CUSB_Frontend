@@ -15,6 +15,7 @@ import {
 import { CategoryType } from '@/shared/types/category.types';
 import { useUploadVacancyImage, useDeleteVacancyImage } from '@/shared/queries/recruitment';
 import { useGetCategories } from '@/shared/queries/categories/categories.queries';
+import { stripHtmlToText } from '@/shared/utils/helpers';
 
 interface ExtendedAddEditVacancyModalProps {
   vacancy?: Vacancy;
@@ -79,7 +80,7 @@ const validate = (v: FormValues): Errs => {
   }
 
   // Quill might put '<p><br></p>' for empty
-  const plainTextDesc = v.description.replace(/<[^>]*>?/gm, '').trim();
+  const plainTextDesc = stripHtmlToText(v.description);
   if (!plainTextDesc) {
     e.description = 'Description is required.';
   }

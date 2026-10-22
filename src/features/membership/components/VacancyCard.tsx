@@ -3,6 +3,7 @@ import { HiBriefcase, HiChevronRight } from 'react-icons/hi';
 import { useTheme } from '@/shared/hooks/useTheme';
 import { Vacancy } from '@/shared/types/recruitment.types';
 import { useNavigate } from 'react-router-dom';
+import { stripHtmlToText } from '@/shared/utils/helpers';
 
 const CATEGORY_COLORS: Record<string, string> = {
   Technical: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
@@ -76,7 +77,7 @@ export const VacancyCard = ({ vacancy, onApply, hasApplied }: VacancyCardProps) 
           <p className={`text-sm line-clamp-3 flex-1 ${
             isDark ? 'text-gray-400' : 'text-gray-600'
           }`}>
-            {vacancy.description.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ')}
+            {stripHtmlToText(vacancy.description)}
           </p>
         )}
 

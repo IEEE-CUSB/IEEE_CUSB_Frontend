@@ -20,6 +20,7 @@ import {
 } from '@/shared/queries/recruitment';
 import { AddEditVacancyModal } from './AddEditVacancyModal';
 import { VacancyApplicationsModal } from './VacancyApplicationsModal';
+import { stripHtmlToText } from '@/shared/utils/helpers';
 
 const VacanciesTab = () => {
   const { isDark } = useTheme();
@@ -282,7 +283,7 @@ const VacanciesTab = () => {
                 }
               )}`}
               badge={badgeText}
-              description={vacancy.description ? vacancy.description.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ') : undefined}
+              description={vacancy.description ? stripHtmlToText(vacancy.description) : undefined}
               avatar={
                 vacancy.image_url ? (
                   <img

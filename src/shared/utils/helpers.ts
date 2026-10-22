@@ -66,3 +66,34 @@ export const getErrorMessage = (error: unknown): string => {
   if ((error as any).message) return (error as any).message;
   return 'Unknown error occurred';
 };
+
+/**
+ * Strip HTML tags and decode HTML entities to plain text
+ * @param html - HTML string to convert
+ * @returns Clean plain text string
+ */
+export const stripHtmlToText = (html: string): string => {
+  if (!html) return '';
+
+  // Replace block elements and line breaks with spaces so words don't merge together
+  const spacedHtml = html
+    .replace(/<\/(p|div|h[1-6]|li|tr)>/gi, ' ')
+    .replace(/<br\s*\/?>/gi, ' ');
+
+  if (typeof DOMParser !== 'undefined') {
+    const doc = new DOMParser().parseFromString(spacedHtml, 'text/html');
+    return (doc.body.textContent || '').replace(/\s+/g, ' ').trim();
+  }
+
+  // Fallback for non-browser environments
+  return spacedHtml
+    .replace(/<[^>]*>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&#39;/g, "'")
+    .replace(/&quot;/g, '"')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/\s+/g, ' ')
+    .trim();
+};
