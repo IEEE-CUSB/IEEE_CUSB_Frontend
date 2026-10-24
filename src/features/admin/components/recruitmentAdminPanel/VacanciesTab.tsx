@@ -11,6 +11,7 @@ import {
   AddVacancy,
   UpdateVacancy,
   Vacancy,
+  Society,
 } from '@/shared/types/recruitment.types';
 import {
   useAddVacancy,
@@ -20,7 +21,7 @@ import {
 } from '@/shared/queries/recruitment';
 import { AddEditVacancyModal } from './AddEditVacancyModal';
 import { VacancyApplicationsModal } from './VacancyApplicationsModal';
-import { stripHtmlToText } from '@/shared/utils/helpers';
+import { stripHtmlToText, getSocietyBadgeStyle } from '@/shared/utils/helpers';
 import { Toggle } from '@/shared/components/ui/Toggle';
 
 const VacanciesTab = () => {
@@ -30,14 +31,22 @@ const VacanciesTab = () => {
   const debouncedSearch = useDebounce(search, 300);
   const [page, setPage] = useState(1);
   const limit = 10;
+  const [filterValues, setFilterValues] = useState<Record<string, string | undefined>>({});
 
-  // Reset page when search changes
+  const selectedSociety = (filterValues.society as Society) || undefined;
+
+  // Reset page when search or filters change
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch]);
+  }, [debouncedSearch, selectedSociety]);
 
   // Queries & Mutations
-  const { data, isLoading } = useGetAdminVacancies({ page, limit, search: debouncedSearch });
+  const { data, isLoading } = useGetAdminVacancies({
+    page,
+    limit,
+    search: debouncedSearch,
+    society: selectedSociety,
+  });
   const vacancies = data?.vacancies || [];
   
   const createMutation = useAddVacancy();
@@ -130,12 +139,24 @@ const VacanciesTab = () => {
                 <CgWorkAlt className={`w-4 h-4 ${isDark ? 'text-primary-light' : 'text-primary'}`} />
               </div>
             )}
-            <span
-              className={`font-medium truncate ${isDark ? 'text-white' : 'text-gray-900'}`}
-              title={item.title}
-            >
-              {item.title}
-            </span>
+            <div className="flex items-center gap-2 min-w-0">
+              <span
+                className={`font-medium truncate ${isDark ? 'text-white' : 'text-gray-900'}`}
+                title={item.title}
+              >
+                {item.title}
+              </span>
+              {item.society && (
+                <span
+                  className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold shrink-0 border ${getSocietyBadgeStyle(
+                    item.society,
+                    isDark
+                  )}`}
+                >
+                  {item.society}
+                </span>
+              )}
+            </div>
           </div>
         ),
       },
@@ -255,6 +276,29 @@ const VacanciesTab = () => {
         search={search}
         onSearchChange={setSearch}
         searchPlaceholder="Search by title or description..."
+        filters={[
+          {
+            key: 'society',
+            label: 'Society',
+            placeholder: 'All Societies',
+            options: [
+              { label: 'EMBS', value: 'EMBS' },
+              { label: 'PES', value: 'PES' },
+              { label: 'RAS', value: 'RAS' },
+              { label: 'CS', value: 'CS' },
+            ],
+          },
+        ]}
+        filterValues={filterValues}
+        onFilterChange={(key, value) => {
+          setFilterValues(prev => ({ ...prev, [key]: value }));
+          setPage(1);
+        }}
+        onClearFilters={() => {
+          setFilterValues({});
+          setSearch('');
+          setPage(1);
+        }}
         emptyMessage="No vacancies found. Click 'Add Vacancy' to create one."
         darkMode={isDark}
         page={page}
@@ -284,7 +328,7 @@ const VacanciesTab = () => {
                   minute: '2-digit',
                 }
               )}`}
-              badge={badgeText}
+              badge={vacancy.society ? `${vacancy.society} · ${badgeText}` : badgeText}
               description={vacancy.description ? stripHtmlToText(vacancy.description) : undefined}
               avatar={
                 vacancy.image_url ? (

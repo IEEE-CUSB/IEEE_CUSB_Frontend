@@ -2,7 +2,17 @@ import { motion, useInView } from 'framer-motion';
 import { useRef, useState } from 'react';
 import { TeamMember } from '@/shared/types/team.types';
 import { IoLogoLinkedin } from 'react-icons/io5';
-import { FaGithub, FaTwitter } from 'react-icons/fa';
+import { FaGithub } from 'react-icons/fa';
+import { FaXTwitter } from 'react-icons/fa6';
+import { Modal } from '@ieee-ui/ui';
+import { useTheme } from '@/shared/hooks/useTheme';
+
+const formatSocialUrl = (url?: string): string | undefined => {
+  if (!url) return undefined;
+  const trimmed = url.trim();
+  if (!trimmed || trimmed === '#') return undefined;
+  return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+};
 
 // ─── Size tokens ─────────────────────────────────────────────────────────────
 //
@@ -139,14 +149,21 @@ export const MemberCard = ({
   size = 'lg',
   disableReveal = false,
 }: MemberCardProps) => {
+  const { isDark } = useTheme();
   const [hovered, setHovered] = useState(false);
   const [tapped, setTapped] = useState(false);
+  const [isBioModalOpen, setIsBioModalOpen] = useState(false);
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: '-80px' });
 
   const isActive = hovered || tapped;
   const displayRole = roleOverride ?? member.role;
   const s = SIZE[size];
+
+  const linkedinUrl = formatSocialUrl(member.socials?.linkedin);
+  const githubUrl = formatSocialUrl(member.socials?.github);
+  const twitterUrl = formatSocialUrl(member.socials?.twitter);
+  const hasSocials = Boolean(linkedinUrl || githubUrl || twitterUrl);
 
   // Label slides up and fades out when card expands.
   // The negative y keeps it inside the fixed-height container.
@@ -198,7 +215,7 @@ export const MemberCard = ({
 
         {/* Overlay with bio + socials */}
         <motion.div
-          className={`absolute inset-0 bg-linear-to-t from-primary/90 via-primary/40 to-transparent
+          className={`absolute inset-0 bg-linear-to-t from-primary/95 via-primary/50 to-transparent
                                 flex flex-col justify-end ${s.overlayPadding} text-white`}
           animate={{ opacity: isActive ? 1 : 0 }}
           transition={{
@@ -206,47 +223,74 @@ export const MemberCard = ({
             duration: isActive ? 0.5 : 0.15,
           }}
         >
-          <h3 className={`${s.nameOverlayCls} text-center`}>{member.name}</h3>
-          <p className={`${s.roleOverlayCls} text-center font-light mb-2`}>
+          <h3 className={`${s.nameOverlayCls} text-center leading-tight`}>
+            {member.name}
+          </h3>
+          <p
+            className={`${s.roleOverlayCls} text-center font-light mb-1.5 opacity-90`}
+          >
             {displayRole}
           </p>
+
+          {/* Bio snippet with tooltip and modal trigger */}
           {member.bio && (
-            <p className={`${s.bioCls} text-center font-light mb-2`}>
-              {member.bio}
-            </p>
+            <div className="w-full text-center my-0.5">
+              <p
+                className={`${s.bioCls} text-center font-light leading-snug opacity-95 hover:underline cursor-pointer`}
+                title={member.bio}
+                onClick={e => {
+                  e.stopPropagation();
+                  setIsBioModalOpen(true);
+                }}
+              >
+                {member.bio}
+              </p>
+            </div>
           )}
-          <div className={`flex gap-3 justify-center ${s.iconCls}`}>
-            {member.socials?.linkedin && member.socials.linkedin !== '#' && (
-              <a
-                href={member.socials.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={e => e.stopPropagation()}
-              >
-                <IoLogoLinkedin className="hover:text-[#0077b5] transition-colors duration-200" />
-              </a>
-            )}
-            {member.socials?.github && (
-              <a
-                href={member.socials.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={e => e.stopPropagation()}
-              >
-                <FaGithub className="hover:text-foreground transition-colors duration-200" />
-              </a>
-            )}
-            {member.socials?.twitter && (
-              <a
-                href={member.socials.twitter}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={e => e.stopPropagation()}
-              >
-                <FaTwitter className="hover:text-[#1DA1F2] transition-colors duration-200" />
-              </a>
-            )}
-          </div>
+
+          {/* Social icons */}
+          {hasSocials && (
+            <div
+              className={`flex gap-3 justify-center items-center ${s.iconCls} mt-1.5`}
+            >
+              {linkedinUrl && (
+                <a
+                  href={linkedinUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={e => e.stopPropagation()}
+                  className="text-white/80 hover:text-[#0077b5] hover:scale-110 transition-all duration-200"
+                  title="LinkedIn"
+                >
+                  <IoLogoLinkedin />
+                </a>
+              )}
+              {githubUrl && (
+                <a
+                  href={githubUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={e => e.stopPropagation()}
+                  className="text-white/80 hover:text-white hover:scale-110 transition-all duration-200"
+                  title="GitHub"
+                >
+                  <FaGithub />
+                </a>
+              )}
+              {twitterUrl && (
+                <a
+                  href={twitterUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={e => e.stopPropagation()}
+                  className="text-white/80 hover:text-[#1DA1F2] hover:scale-110 transition-all duration-200"
+                  title="Twitter / X"
+                >
+                  <FaXTwitter />
+                </a>
+              )}
+            </div>
+          )}
         </motion.div>
       </motion.div>
 
@@ -263,6 +307,87 @@ export const MemberCard = ({
         <p className={s.nameCls}>{member.name}</p>
         <p className={`text-primary ${s.roleCls}`}>{displayRole}</p>
       </motion.div>
+
+      {/* ── Bio Modal ── */}
+      {member.bio && (
+        <Modal
+          isOpen={isBioModalOpen}
+          onClose={() => setIsBioModalOpen(false)}
+          title={member.name}
+          size="medium"
+          darkMode={isDark}
+        >
+          <div className="space-y-4">
+            <div className="flex items-center gap-4">
+              <img
+                src={member.image}
+                alt={member.name}
+                className="w-16 h-16 rounded-full object-cover border-2 border-primary/20 shrink-0"
+              />
+              <div className="min-w-0 flex-1">
+                <h4
+                  className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}
+                >
+                  {member.name}
+                </h4>
+                <p className="text-sm font-medium text-primary">
+                  {displayRole}
+                </p>
+                {hasSocials && (
+                  <div className="flex items-center gap-3 mt-2 text-base">
+                    {linkedinUrl && (
+                      <a
+                        href={linkedinUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-gray-500 hover:text-[#0077b5] transition-colors"
+                        title="LinkedIn"
+                      >
+                        <IoLogoLinkedin />
+                      </a>
+                    )}
+                    {githubUrl && (
+                      <a
+                        href={githubUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'}`}
+                        title="GitHub"
+                      >
+                        <FaGithub />
+                      </a>
+                    )}
+                    {twitterUrl && (
+                      <a
+                        href={twitterUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-gray-500 hover:text-[#1DA1F2] transition-colors"
+                        title="Twitter / X"
+                      >
+                        <FaXTwitter />
+                      </a>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div
+              className={`p-4 rounded-xl border ${isDark ? 'bg-gray-800/60 border-gray-700 text-gray-300' : 'bg-gray-50 border-gray-200 text-gray-700'}`}
+            >
+              <h5
+                className={`text-xs font-semibold uppercase tracking-wider mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}
+              >
+                About / Bio
+              </h5>
+              <p className="text-sm leading-relaxed whitespace-pre-line">
+                {member.bio}
+              </p>
+            </div>
+          </div>
+        </Modal>
+      )}
     </motion.div>
   );
 };

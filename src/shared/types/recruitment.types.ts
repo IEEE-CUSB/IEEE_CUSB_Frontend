@@ -14,6 +14,9 @@ export interface PaginatedResponse<T> {
   message?: string;
 }
 
+export type Society = 'EMBS' | 'PES' | 'RAS' | 'CS';
+export const SOCIETIES: Society[] = ['EMBS', 'PES', 'RAS', 'CS'];
+
 export enum ApplicationStatus {
   PENDING = 'PENDING',
   ACCEPTED = 'ACCEPTED',
@@ -40,6 +43,7 @@ export interface Vacancy {
   category_id?: string | null;
   category?: Category | null;
   questions?: Question[];
+  society?: Society | null;
   created_at: string;
   updated_at: string;
 }
@@ -68,6 +72,7 @@ export interface AddVacancy {
   description: string;
   is_open: boolean;
   category_id?: string | null;
+  society?: Society | null;
   questions?: Question[];
 }
 
@@ -76,6 +81,7 @@ export interface UpdateVacancy {
   description?: string;
   is_open?: boolean;
   category_id?: string | null;
+  society?: Society | null;
   questions?: Question[];
 }
 
@@ -85,6 +91,7 @@ export interface UpdateStatus {
 
 export interface GetAllApplicationsParams {
   vacancyId: string;
+  society?: Society;
   startDate?: string;
   endDate?: string;
   page?: number;
@@ -94,6 +101,7 @@ export interface GetAllApplicationsParams {
 
 export interface ExportApplicationsParams {
   vacancyId: string;
+  society?: Society;
   startDate?: string;
   endDate?: string;
   [key: string]: any;

@@ -1,7 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { InputField, Button, Modal, Select } from '@ieee-ui/ui';
 import { useTheme } from '@/shared/hooks/useTheme';
-import {  FiUpload, FiTrash2, FiImage, FiX, FiPlus, FiArrowUp, FiArrowDown } from 'react-icons/fi';
+import {
+  FiUpload,
+  FiTrash2,
+  FiImage,
+  FiX,
+  FiPlus,
+  FiArrowUp,
+  FiArrowDown,
+} from 'react-icons/fi';
 import { toast } from 'react-hot-toast';
 import { Toggle } from '@/shared/components/ui/Toggle';
 import ReactQuill from 'react-quill-new';
@@ -11,9 +19,13 @@ import {
   UpdateVacancy,
   Vacancy,
   Question,
+  Society,
 } from '@/shared/types/recruitment.types';
 import { CategoryType } from '@/shared/types/category.types';
-import { useUploadVacancyImage, useDeleteVacancyImage } from '@/shared/queries/recruitment';
+import {
+  useUploadVacancyImage,
+  useDeleteVacancyImage,
+} from '@/shared/queries/recruitment';
 import { useGetCategories } from '@/shared/queries/categories/categories.queries';
 import { stripHtmlToText } from '@/shared/utils/helpers';
 
@@ -22,7 +34,10 @@ interface ExtendedAddEditVacancyModalProps {
   apiVacancy?: Vacancy;
   isOpen: boolean;
   onClose: () => void;
-  onSave: (data: AddVacancy | UpdateVacancy, id?: string) => Promise<string | undefined>;
+  onSave: (
+    data: AddVacancy | UpdateVacancy,
+    id?: string
+  ) => Promise<string | undefined>;
   isPending?: boolean;
 }
 
@@ -33,8 +48,17 @@ interface FormValues {
   updated_at: string;
   is_open: boolean;
   category_id: string;
+  society: string;
   questions: Question[];
 }
+
+const SOCIETY_OPTIONS = [
+  { label: 'None / General Chapter', value: 'NONE' },
+  { label: 'EMBS', value: 'EMBS' },
+  { label: 'PES', value: 'PES' },
+  { label: 'RAS', value: 'RAS' },
+  { label: 'CS', value: 'CS' },
+];
 
 const empty = (): FormValues => ({
   title: '',
@@ -43,6 +67,7 @@ const empty = (): FormValues => ({
   updated_at: '',
   is_open: true,
   category_id: '',
+  society: 'NONE',
   questions: [],
 });
 
@@ -63,7 +88,12 @@ const toForm = (v?: Vacancy): FormValues =>
         updated_at: formatDateForInput(v.updated_at),
         is_open: v.is_open,
         category_id: v.category_id ?? v.category?.id ?? '',
-        questions: v.questions || [],
+        society: v.society || 'NONE',
+        questions: v.questions
+          ? [...v.questions]
+              .sort((a, b) => Number(a.order ?? 0) - Number(b.order ?? 0))
+              .map((q, idx) => ({ ...q, order: idx }))
+          : [],
       }
     : empty();
 
@@ -87,14 +117,9 @@ const validate = (v: FormValues): Errs => {
   return e;
 };
 
-export const AddEditVacancyModal: React.FC<ExtendedAddEditVacancyModalProps> = ({
-  vacancy,
-  apiVacancy,
-  isOpen,
-  onClose,
-  onSave,
-  isPending = false,
-}) => {
+export const AddEditVacancyModal: React.FC<
+  ExtendedAddEditVacancyModalProps
+> = ({ vacancy, apiVacancy, isOpen, onClose, onSave, isPending = false }) => {
   const { isDark } = useTheme();
   const isEditMode = !!vacancy;
   const vacancyId = apiVacancy?.id || vacancy?.id;
@@ -107,12 +132,16 @@ export const AddEditVacancyModal: React.FC<ExtendedAddEditVacancyModalProps> = (
 
   const uploadImageMutation = useUploadVacancyImage();
   const deleteImageMutation = useDeleteVacancyImage();
-  const { data: categoriesPayload } = useGetCategories({ type: CategoryType.RECRUITMENT, limit: 100 });
+  const { data: categoriesPayload } = useGetCategories({
+    type: CategoryType.RECRUITMENT,
+    limit: 100,
+  });
   const categories = categoriesPayload?.categories || [];
-
   // Form state
   const [formKey, setFormKey] = useState(0);
-  const [formValues, setFormValues] = useState<FormValues>(() => toForm(vacancy));
+  const [formValues, setFormValues] = useState<FormValues>(() =>
+    toForm(vacancy)
+  );
   const [errors, setErrors] = useState<Errs>({});
   const [isSaving, setIsSaving] = useState(false);
 
@@ -212,11 +241,16 @@ export const AddEditVacancyModal: React.FC<ExtendedAddEditVacancyModalProps> = (
 
   const handleDescriptionChange = (value: string) => {
     setFormValues(prev => ({ ...prev, description: value }));
-    if (errors.description) setErrors(prev => ({ ...prev, description: undefined }));
+    if (errors.description)
+      setErrors(prev => ({ ...prev, description: undefined }));
   };
 
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setFormValues(prev => ({ ...prev, category_id: e.target.value }));
+  };
+
+  const handleSocietyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setFormValues(prev => ({ ...prev, society: e.target.value }));
   };
 
   /* Questions Handlers */
@@ -226,10 +260,11 @@ export const AddEditVacancyModal: React.FC<ExtendedAddEditVacancyModalProps> = (
       questions: [
         ...prev.questions,
         {
-          id: Date.now().toString(),
+          id: `temp-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
           type: 'TEXT',
           question_text: '',
           is_required: false,
+          order: prev.questions.length,
         },
       ],
     }));
@@ -252,39 +287,48 @@ export const AddEditVacancyModal: React.FC<ExtendedAddEditVacancyModalProps> = (
   const removeQuestion = (index: number) => {
     setFormValues(prev => ({
       ...prev,
-      questions: prev.questions.filter((_, i) => i !== index),
+      questions: prev.questions
+        .filter((_, i) => i !== index)
+        .map((q, i) => ({ ...q, order: i })),
     }));
   };
   const moveQuestion = (index: number, direction: 'up' | 'down') => {
     setFormValues(prev => {
       const newQuestions = [...prev.questions];
       if (direction === 'up' && index > 0) {
-        const temp = newQuestions[index - 1];
+        const temp = newQuestions[index - 1]!;
         newQuestions[index - 1] = newQuestions[index]!;
-        newQuestions[index] = temp!;
+        newQuestions[index] = temp;
       } else if (direction === 'down' && index < newQuestions.length - 1) {
-        const temp = newQuestions[index + 1];
+        const temp = newQuestions[index + 1]!;
         newQuestions[index + 1] = newQuestions[index]!;
-        newQuestions[index] = temp!;
+        newQuestions[index] = temp;
       }
-      return { ...prev, questions: newQuestions };
+      return {
+        ...prev,
+        questions: newQuestions.map((q, i) => ({ ...q, order: i })),
+      };
     });
   };
-
-
-
 
   const addOption = (questionIndex: number) => {
     setFormValues(prev => {
       const newQuestions = [...prev.questions];
       const q = { ...newQuestions[questionIndex]! };
-      q.options = [...(q.options || []), `Option ${(q.options?.length || 0) + 1}`];
+      q.options = [
+        ...(q.options || []),
+        `Option ${(q.options?.length || 0) + 1}`,
+      ];
       newQuestions[questionIndex] = q;
       return { ...prev, questions: newQuestions };
     });
   };
 
-  const updateOption = (questionIndex: number, optionIndex: number, value: string) => {
+  const updateOption = (
+    questionIndex: number,
+    optionIndex: number,
+    value: string
+  ) => {
     setFormValues(prev => {
       const newQuestions = [...prev.questions];
       const q = { ...newQuestions[questionIndex]! };
@@ -310,21 +354,27 @@ export const AddEditVacancyModal: React.FC<ExtendedAddEditVacancyModalProps> = (
 
   /* Save */
   const handleSave = async (e?: React.MouseEvent) => {
-    if (e) { e.preventDefault(); e.stopPropagation(); }
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
 
     const validationErrors = validate(formValues);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
-    
+
     // validate questions
     for (const q of formValues.questions) {
       if (!q.question_text.trim()) {
         toast.error('All questions must have a title.');
         return;
       }
-      if (q.type === 'MULTIPLE_CHOICE' && (!q.options || q.options.length === 0)) {
+      if (
+        q.type === 'MULTIPLE_CHOICE' &&
+        (!q.options || q.options.length === 0)
+      ) {
         toast.error('Multiple choice questions must have at least one option.');
         return;
       }
@@ -337,11 +387,21 @@ export const AddEditVacancyModal: React.FC<ExtendedAddEditVacancyModalProps> = (
       description: formValues.description.trim(),
       is_open: formValues.is_open,
       category_id: formValues.category_id || null,
-      questions: formValues.questions.map((q, i) => ({
-        ...q,
-        id: q.id?.length === 13 && !isNaN(Number(q.id)) ? undefined : q.id, // strip temp frontend id if needed
-        order: i,
-      })),
+      society:
+        formValues.society && formValues.society !== 'NONE'
+          ? (formValues.society as Society)
+          : null,
+      questions: formValues.questions.map((q, i) => {
+        const isTemp =
+          !q.id ||
+          q.id.startsWith('temp-') ||
+          (q.id.length === 13 && !isNaN(Number(q.id)));
+        return {
+          ...q,
+          id: isTemp ? undefined : q.id,
+          order: i,
+        };
+      }),
     };
 
     try {
@@ -350,8 +410,12 @@ export const AddEditVacancyModal: React.FC<ExtendedAddEditVacancyModalProps> = (
       // After save, handle image upload/delete if editing an existing vacancy
       if (savedId) {
         const promises = [];
-        if (pendingImage) promises.push(uploadImageMutation.mutateAsync({ id: savedId, file: pendingImage }));
-        if (deleteImage) promises.push(deleteImageMutation.mutateAsync(savedId));
+        if (pendingImage)
+          promises.push(
+            uploadImageMutation.mutateAsync({ id: savedId, file: pendingImage })
+          );
+        if (deleteImage)
+          promises.push(deleteImageMutation.mutateAsync(savedId));
         await Promise.all(promises);
       }
       onClose();
@@ -360,7 +424,9 @@ export const AddEditVacancyModal: React.FC<ExtendedAddEditVacancyModalProps> = (
     }
   };
 
-  const currentImageUrl = imagePreview || (deleteImage ? null : (apiVacancy?.image_url || vacancy?.image_url));
+  const currentImageUrl =
+    imagePreview ||
+    (deleteImage ? null : apiVacancy?.image_url || vacancy?.image_url);
 
   return (
     <Modal
@@ -385,7 +451,9 @@ export const AddEditVacancyModal: React.FC<ExtendedAddEditVacancyModalProps> = (
             />
           </div>
           <div className="md:col-span-2">
-            <label className={`block text-sm font-medium mb-1.5 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+            <label
+              className={`block text-sm font-medium mb-1.5 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
+            >
               Description
             </label>
             <div
@@ -401,39 +469,54 @@ export const AddEditVacancyModal: React.FC<ExtendedAddEditVacancyModalProps> = (
                 placeholder="Write a clear and detailed description of the vacancy..."
               />
             </div>
-            {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
+            {errors.description && (
+              <p className="text-red-500 text-sm mt-1">{errors.description}</p>
+            )}
           </div>
         </div>
 
         {/* Form Builder Section */}
-        <div className={`p-4 rounded-xl border ${isDark ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'}`}>
+        <div
+          className={`p-4 rounded-xl border ${isDark ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'}`}
+        >
           <div className="flex items-center justify-between mb-4">
-            <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>Form Builder</h3>
+            <h3
+              className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}
+            >
+              Form Builder
+            </h3>
           </div>
           <div className="space-y-4">
             {formValues.questions.map((q, index) => (
-              <div key={index} className={`p-4 rounded-xl border ${isDark ? 'border-gray-600 bg-gray-700' : 'border-gray-200 bg-white'}`}>
+              <div
+                key={q.id || `q-${index}`}
+                className={`p-4 rounded-xl border ${isDark ? 'border-gray-600 bg-gray-700' : 'border-gray-200 bg-white'}`}
+              >
                 <div className="flex items-start justify-between gap-4 mb-4">
                   <div className="flex-1">
                     <InputField
                       label={`Question ${index + 1}`}
                       value={q.question_text}
-                      onChange={(e) => updateQuestion(index, 'question_text', e.target.value)}
+                      onChange={e =>
+                        updateQuestion(index, 'question_text', e.target.value)
+                      }
                       placeholder="Enter question text..."
                       darkMode={isDark}
-                      id={`q-${index}`}
+                      id={`q-${q.id || index}`}
                     />
                   </div>
                   <div className="mt-8 flex flex-col gap-1">
                     <div className="flex gap-1">
-                      <button type="button"
+                      <button
+                        type="button"
                         onClick={() => moveQuestion(index, 'up')}
                         disabled={index === 0}
                         className="p-1.5 text-gray-500 hover:bg-gray-100 rounded transition-colors disabled:opacity-30 disabled:hover:bg-transparent"
                       >
                         <FiArrowUp className="w-4 h-4" />
                       </button>
-                      <button type="button"
+                      <button
+                        type="button"
                         onClick={() => moveQuestion(index, 'down')}
                         disabled={index === formValues.questions.length - 1}
                         className="p-1.5 text-gray-500 hover:bg-gray-100 rounded transition-colors disabled:opacity-30 disabled:hover:bg-transparent"
@@ -441,7 +524,8 @@ export const AddEditVacancyModal: React.FC<ExtendedAddEditVacancyModalProps> = (
                         <FiArrowDown className="w-4 h-4" />
                       </button>
                     </div>
-                    <button type="button"
+                    <button
+                      type="button"
                       onClick={() => removeQuestion(index)}
                       className="p-1.5 text-red-500 hover:bg-red-100 rounded transition-colors flex justify-center"
                     >
@@ -449,14 +533,16 @@ export const AddEditVacancyModal: React.FC<ExtendedAddEditVacancyModalProps> = (
                     </button>
                   </div>
                 </div>
-                
+
                 <div className="flex gap-4 items-center">
                   <div className="flex-1">
                     <Select
                       id={`type-${index}`}
                       label="Type"
                       value={q.type}
-                      onChange={(e) => updateQuestion(index, 'type', e.target.value)}
+                      onChange={e =>
+                        updateQuestion(index, 'type', e.target.value)
+                      }
                       options={[
                         { label: 'Short Text', value: 'TEXT' },
                         { label: 'Long Text', value: 'LONG_TEXT' },
@@ -469,7 +555,9 @@ export const AddEditVacancyModal: React.FC<ExtendedAddEditVacancyModalProps> = (
                   <div className="pt-6">
                     <Toggle
                       checked={q.is_required}
-                      onChange={(val) => updateQuestion(index, 'is_required', val)}
+                      onChange={val =>
+                        updateQuestion(index, 'is_required', val)
+                      }
                       labelOn="Required"
                       labelOff="Optional"
                       darkMode={isDark}
@@ -478,45 +566,79 @@ export const AddEditVacancyModal: React.FC<ExtendedAddEditVacancyModalProps> = (
                 </div>
 
                 {q.type === 'MULTIPLE_CHOICE' && (
-                  <div className={`mt-4 p-3 rounded-lg border ${isDark ? 'border-gray-600' : 'border-gray-200'}`}>
+                  <div
+                    className={`mt-4 p-3 rounded-lg border ${isDark ? 'border-gray-600' : 'border-gray-200'}`}
+                  >
                     <div className="flex items-center justify-between mb-3">
-                      <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Options</label>
+                      <label
+                        className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
+                      >
+                        Options
+                      </label>
                       <label className="flex items-center gap-2 cursor-pointer">
-                        <input 
-                          type="checkbox" 
+                        <input
+                          type="checkbox"
                           checked={q.allow_multiple_selection || false}
-                          onChange={(e) => updateQuestion(index, 'allow_multiple_selection', e.target.checked)}
+                          onChange={e =>
+                            updateQuestion(
+                              index,
+                              'allow_multiple_selection',
+                              e.target.checked
+                            )
+                          }
                           className="w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary"
                         />
-                        <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Allow Multiple Selection</span>
+                        <span
+                          className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}
+                        >
+                          Allow Multiple Selection
+                        </span>
                       </label>
                     </div>
                     {q.options?.map((opt, optIndex) => (
-                      <div key={optIndex} className="flex items-center gap-2 mb-2">
+                      <div
+                        key={optIndex}
+                        className="flex items-center gap-2 mb-2"
+                      >
                         <div className="flex-1">
                           <InputField
                             id={`opt-${index}-${optIndex}`}
                             value={opt}
-                            onChange={(e) => updateOption(index, optIndex, e.target.value)}
+                            onChange={e =>
+                              updateOption(index, optIndex, e.target.value)
+                            }
                             placeholder={`Option ${optIndex + 1}`}
                             darkMode={isDark}
                           />
                         </div>
-                        <button type="button" onClick={() => removeOption(index, optIndex)} className="p-1.5 text-red-500 hover:bg-red-100 rounded">
+                        <button
+                          type="button"
+                          onClick={() => removeOption(index, optIndex)}
+                          className="p-1.5 text-red-500 hover:bg-red-100 rounded"
+                        >
                           <FiX />
                         </button>
                       </div>
                     ))}
-                    <button type="button" onClick={() => addOption(index)} className={`text-sm flex items-center gap-1 mt-2 ${isDark ? 'text-primary-light hover:text-primary' : 'text-primary hover:text-primary-dark'}`}>
+                    <button
+                      type="button"
+                      onClick={() => addOption(index)}
+                      className={`text-sm flex items-center gap-1 mt-2 ${isDark ? 'text-primary-light hover:text-primary' : 'text-primary hover:text-primary-dark'}`}
+                    >
                       <FiPlus /> Add Option
                     </button>
                   </div>
                 )}
               </div>
             ))}
-            
+
             {formValues.questions.length === 0 && (
-              <p className={`text-center py-4 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>No questions added yet. Click "Add Question" to start building your form.</p>
+              <p
+                className={`text-center py-4 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}
+              >
+                No questions added yet. Click "Add Question" to start building
+                your form.
+              </p>
             )}
 
             <div className="flex justify-center mt-4">
@@ -531,9 +653,9 @@ export const AddEditVacancyModal: React.FC<ExtendedAddEditVacancyModalProps> = (
           </div>
         </div>
 
-        {/* Category + Status row */}
-        <div className="flex flex-wrap items-end gap-4">
-          <div className="flex-1 min-w-[200px]">
+        {/* Category & Society + Status row */}
+        <div className="flex flex-wrap items-start gap-8">
+          <div className="flex-1 min-w-[200px] flex flex-col gap-4">
             <Select
               id="category"
               label="Category"
@@ -545,14 +667,26 @@ export const AddEditVacancyModal: React.FC<ExtendedAddEditVacancyModalProps> = (
               onChange={handleCategoryChange}
               darkMode={isDark}
             />
+            <Select
+              id="society"
+              label="Society"
+              options={SOCIETY_OPTIONS}
+              value={formValues.society}
+              onChange={handleSocietyChange}
+              darkMode={isDark}
+            />
           </div>
-          <div>
-            <label className={`block text-sm font-medium mb-1.5 ${ isDark ? 'text-gray-300' : 'text-gray-700' }`}>
+          <div className="md:col-span-2">
+            <label
+              className={`block text-sm font-medium mb-1.5 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
+            >
               Status
             </label>
             <Toggle
               checked={formValues.is_open}
-              onChange={val => setFormValues(prev => ({ ...prev, is_open: val }))}
+              onChange={val =>
+                setFormValues(prev => ({ ...prev, is_open: val }))
+              }
               labelOn="Open"
               labelOff="Closed"
               darkMode={isDark}
@@ -562,23 +696,35 @@ export const AddEditVacancyModal: React.FC<ExtendedAddEditVacancyModalProps> = (
 
         {/* Image Upload Section */}
         <div>
-          <label className={`block text-sm font-medium mb-2 ${ isDark ? 'text-gray-300' : 'text-gray-700' }`}>
+          <label
+            className={`block text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
+          >
             Position Image
           </label>
 
           {currentImageUrl ? (
             <div className="relative w-full h-44 rounded-xl overflow-hidden group">
-              <img src={currentImageUrl} alt="Preview" className="w-full h-full object-cover" />
+              <img
+                src={currentImageUrl}
+                alt="Preview"
+                className="w-full h-full object-cover"
+              />
               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-                <button type="button"
+                <button
+                  type="button"
                   onClick={() => primaryFileRef.current?.click()}
                   className="p-2 rounded-lg bg-white/20 hover:bg-white/30 text-white transition-colors"
                   title="Replace image"
                 >
                   <FiUpload className="w-5 h-5" />
                 </button>
-                <button type="button"
-                  onClick={apiVacancy?.image_public_id && !pendingImage ? handleMarkDeleteImage : handleClearImage}
+                <button
+                  type="button"
+                  onClick={
+                    apiVacancy?.image_public_id && !pendingImage
+                      ? handleMarkDeleteImage
+                      : handleClearImage
+                  }
                   className="p-2 rounded-lg bg-red-500/70 hover:bg-red-500 text-white transition-colors"
                   title="Remove image"
                 >
@@ -587,14 +733,19 @@ export const AddEditVacancyModal: React.FC<ExtendedAddEditVacancyModalProps> = (
               </div>
               {pendingImage && (
                 <div className="absolute top-2 right-2">
-                  <button type="button" onClick={handleClearImage} className="p-1 rounded-full bg-black/50 text-white hover:bg-black/70">
+                  <button
+                    type="button"
+                    onClick={handleClearImage}
+                    className="p-1 rounded-full bg-black/50 text-white hover:bg-black/70"
+                  >
                     <FiX className="w-3 h-3" />
                   </button>
                 </div>
               )}
             </div>
           ) : (
-            <button type="button"
+            <button
+              type="button"
               onClick={() => primaryFileRef.current?.click()}
               className={`w-full h-36 rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-2 transition-colors ${
                 isDark
@@ -617,14 +768,19 @@ export const AddEditVacancyModal: React.FC<ExtendedAddEditVacancyModalProps> = (
           />
 
           {pendingImage && !vacancyId && (
-            <p className={`mt-1.5 text-xs ${ isDark ? 'text-yellow-400' : 'text-yellow-600' }`}>
-              ⚠ Image will be uploaded after saving the vacancy. Re-edit to add the image.
+            <p
+              className={`mt-1.5 text-xs ${isDark ? 'text-yellow-400' : 'text-yellow-600'}`}
+            >
+              ⚠ Image will be uploaded after saving the vacancy. Re-edit to add
+              the image.
             </p>
           )}
         </div>
 
         {/* Actions */}
-        <div className={`flex items-center justify-end gap-3 pt-4 border-t ${isDark ? 'border-gray-700' : 'border-gray-100'}`}>
+        <div
+          className={`flex items-center justify-end gap-3 pt-4 border-t ${isDark ? 'border-gray-700' : 'border-gray-100'}`}
+        >
           <Button
             buttonText="Cancel"
             onClick={onClose}

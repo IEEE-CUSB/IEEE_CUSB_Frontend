@@ -3,7 +3,7 @@ import { HiBriefcase, HiChevronRight } from 'react-icons/hi';
 import { useTheme } from '@/shared/hooks/useTheme';
 import { Vacancy } from '@/shared/types/recruitment.types';
 import { useNavigate } from 'react-router-dom';
-import { stripHtmlToText } from '@/shared/utils/helpers';
+import { stripHtmlToText, getSocietyBadgeStyle } from '@/shared/utils/helpers';
 
 const CATEGORY_COLORS: Record<string, string> = {
   Technical: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
@@ -21,7 +21,11 @@ interface VacancyCardProps {
   hasApplied?: boolean;
 }
 
-export const VacancyCard = ({ vacancy, onApply, hasApplied }: VacancyCardProps) => {
+export const VacancyCard = ({
+  vacancy,
+  onApply,
+  hasApplied,
+}: VacancyCardProps) => {
   const navigate = useNavigate();
   const { isDark } = useTheme();
   const categoryName = vacancy.category?.name || 'Other';
@@ -41,9 +45,11 @@ export const VacancyCard = ({ vacancy, onApply, hasApplied }: VacancyCardProps) 
       }`}
     >
       {/* Image Section */}
-      <div className={`relative h-44 overflow-hidden flex-shrink-0 ${
-        isDark ? 'bg-gray-700' : 'bg-gray-100'
-      }`}>
+      <div
+        className={`relative h-44 overflow-hidden flex-shrink-0 ${
+          isDark ? 'bg-gray-700' : 'bg-gray-100'
+        }`}
+      >
         {vacancy.image_url ? (
           <img
             src={vacancy.image_url}
@@ -57,42 +63,64 @@ export const VacancyCard = ({ vacancy, onApply, hasApplied }: VacancyCardProps) 
             </div>
           </div>
         )}
-        {/* Category badge overlaid on image */}
-        {categoryName && categoryName !== 'Other' && (
-          <span className={`absolute top-3 left-3 text-xs font-semibold px-2.5 py-1 rounded-full border backdrop-blur-sm ${categoryColor}`}>
-            {categoryName}
-          </span>
-        )}
+        {/* Badges overlaid on image */}
+        <div className="absolute top-3 left-3 flex items-center justify-between gap-2 pointer-events-none">
+          {vacancy.society && (
+            <span
+              className={`text-xs font-semibold px-2.5 py-1 rounded-full border backdrop-blur-md shadow-sm ${getSocietyBadgeStyle(vacancy.society, isDark)}`}
+            >
+              {vacancy.society}
+            </span>
+          )}
+          {categoryName && categoryName !== 'Other' ? (
+            <span
+              className={`text-xs font-semibold px-2.5 py-1 rounded-full border backdrop-blur-md shadow-sm ${categoryColor}`}
+            >
+              {categoryName}
+            </span>
+          ) : (
+            <span />
+          )}
+        </div>
       </div>
 
       {/* Content */}
       <div className="flex flex-col flex-1 p-5">
-        <h3 className={`text-lg font-bold mb-2 leading-snug ${
-          isDark ? 'text-white' : 'text-gray-900'
-        }`}>
+        <h3
+          className={`text-lg font-bold mb-2 leading-snug ${
+            isDark ? 'text-white' : 'text-gray-900'
+          }`}
+        >
           {vacancy.title}
         </h3>
 
         {vacancy.description && (
-          <p className={`text-sm line-clamp-3 flex-1 ${
-            isDark ? 'text-gray-400' : 'text-gray-600'
-          }`}>
+          <p
+            className={`text-sm line-clamp-3 flex-1 ${
+              isDark ? 'text-gray-400' : 'text-gray-600'
+            }`}
+          >
             {stripHtmlToText(vacancy.description)}
           </p>
         )}
 
         <div className="mt-4 flex items-center justify-between gap-3">
           {hasApplied ? (
-            <span className={`text-xs font-semibold px-3 py-1.5 rounded-lg border ${
-              isDark
-                ? 'bg-green-900/30 text-green-300 border-green-500/30'
-                : 'bg-green-50 text-green-700 border-green-200'
-            }`}>
+            <span
+              className={`text-xs font-semibold px-3 py-1.5 rounded-lg border ${
+                isDark
+                  ? 'bg-green-900/30 text-green-300 border-green-500/30'
+                  : 'bg-green-50 text-green-700 border-green-200'
+              }`}
+            >
               ✓ Applied
             </span>
           ) : (
             <button
-              onClick={(e) => { e.stopPropagation(); onApply(vacancy); }}
+              onClick={e => {
+                e.stopPropagation();
+                onApply(vacancy);
+              }}
               className="flex items-center gap-1.5 bg-primary text-white text-sm font-semibold px-4 py-2 rounded-xl hover:bg-primary/90 active:scale-95 transition-all duration-200 shadow-sm shadow-primary/30"
             >
               Apply Now
