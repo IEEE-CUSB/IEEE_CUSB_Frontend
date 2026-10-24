@@ -17,17 +17,17 @@ export const useAddVacancy = () => {
 
   return useMutation({
     mutationFn: ({ data }: { data: AddVacancy }) => api.addVacancy(data),
-    onSuccess: (_, variables) => {
+    onSuccess: () => {
       toast.success('Vacancy Successfully added!');
       queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.RECRUITMENT.ADMIN_VACANCIES,
       });
-
-      if (variables.data?.is_open) {
-        queryClient.invalidateQueries({
-          queryKey: QUERY_KEYS.RECRUITMENT.VACANCIES,
-        });
-      }
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.RECRUITMENT.VACANCIES,
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['vacancy'],
+      });
     },
     onError: (error: any) => {
       toast.error(
@@ -56,12 +56,17 @@ export const useUpdateVacancies = () => {
       queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.RECRUITMENT.ADMIN_VACANCIES,
       });
-
-      if (variables.data?.is_open !== undefined) {
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.RECRUITMENT.VACANCIES,
+      });
+      if (variables?.id) {
         queryClient.invalidateQueries({
-          queryKey: QUERY_KEYS.RECRUITMENT.VACANCIES,
+          queryKey: ['vacancy', variables.id],
         });
       }
+      queryClient.invalidateQueries({
+        queryKey: ['vacancy'],
+      });
     },
     onError: (error: any) => {
       toast.error(error?.response?.data?.message || 'Failed to update vacancy');

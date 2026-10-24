@@ -18,7 +18,7 @@ import {
 import EventsPage from './pages/EventsPage';
 import { AdminLayout } from '../features/admin/layouts/AdminLayout';
 // import { EventsPage as AdminEventsPage } from './pages/admin/EventsPage';
-// import { CommitteesPage as AdminCommittees } from './pages/admin/CommitteesPage';
+import { CommitteesPage as AdminCommittees } from './pages/admin/CommitteesPage';
 // import { AwardsPage as AdminAwardsPage } from './pages/admin/AwardsPage';
 // import { AdminWorkshopsPage } from './pages/admin/WorkshopsPage';
 import { RecruitmentPage as AdminRecruitmentPage } from './pages/admin/RecruitmentPage';
@@ -66,7 +66,7 @@ const routes: RouteObject[] = [
       },
       {
         path: 'committees',
-        element: <UnderConstructionPage />, // Events - Working
+        element: <AdminCommittees />, // Committees & Board Management
       },
       {
         path: 'awards',

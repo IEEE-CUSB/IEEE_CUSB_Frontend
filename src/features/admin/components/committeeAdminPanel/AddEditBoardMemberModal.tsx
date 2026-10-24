@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { InputField, Button, Modal } from '@ieee-ui/ui';
+import { InputField, TextArea, Button, Modal } from '@ieee-ui/ui';
 import { useTheme } from '@/shared/hooks/useTheme';
 import { FiUpload, FiTrash2, FiImage, FiX } from 'react-icons/fi';
 import { toast } from 'react-hot-toast';
@@ -76,6 +76,11 @@ const validate = (v: FormValues): Errs => {
   }
 
   if (!v.role.trim()) e.role = 'Role is required.';
+
+  if (v.bio && v.bio.length > 1000) {
+    e.bio = 'Bio must be at most 1000 characters.';
+  }
+
   return e;
 };
 
@@ -120,7 +125,11 @@ const AddEditBoardMemberModal: React.FC<Props> = ({
 
   const handleChange =
     (f: keyof FormValues) =>
-    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    (
+      e: React.ChangeEvent<
+        HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+      >
+    ) => {
       setForm(p => ({ ...p, [f]: e.target.value }));
       if (errors[f]) setErrors(p => ({ ...p, [f]: undefined }));
     };
@@ -236,13 +245,16 @@ const AddEditBoardMemberModal: React.FC<Props> = ({
             darkMode={isDark}
           />
           <div className="md:col-span-2">
-            <InputField
+            <TextArea
               label="Bio (Optional)"
               value={form.bio}
-              placeholder="e.g. Briefly describe this member..."
+              placeholder="e.g. Briefly describe this member's background, role, or achievements..."
               onChange={handleChange('bio')}
               id="board-bio"
+              maxLength={1000}
+              rows={4}
               error={errors.bio}
+              helperText={`${form.bio.length}/1000 characters`}
               darkMode={isDark}
             />
           </div>
@@ -265,9 +277,9 @@ const AddEditBoardMemberModal: React.FC<Props> = ({
             darkMode={isDark}
           />
           <InputField
-            label="Twitter URL (Optional)"
+            label="Twitter / X URL (Optional)"
             value={form.twitter}
-            placeholder="https://twitter.com/..."
+            placeholder="https://x.com/... or https://twitter.com/..."
             onChange={handleChange('twitter')}
             id="board-twitter"
             error={errors.twitter}

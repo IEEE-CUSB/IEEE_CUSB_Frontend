@@ -9,6 +9,7 @@ import { VacancyApplicationForm } from '@/features/membership/components/Vacancy
 import { useAppSelector } from '@/shared/store/hooks';
 import { useGetUserApplications } from '@/shared/queries/users/users.queries';
 import { Application } from '@/shared/types/recruitment.types';
+import { getSocietyBadgeStyle } from '@/shared/utils/helpers';
 
 export const VacancyDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -70,9 +71,16 @@ export const VacancyDetailsPage = () => {
           
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex items-end p-6 md:p-10">
             <div className="w-full">
-              <span className="inline-block px-3 py-1 bg-primary text-white text-sm font-semibold rounded-full mb-4">
-                {categoryName}
-              </span>
+              <div className="flex items-center gap-2 mb-4 flex-wrap">
+                <span className="inline-block px-3 py-1 bg-primary text-white text-sm font-semibold rounded-full">
+                  {categoryName}
+                </span>
+                {vacancy.society && (
+                  <span className={`inline-block px-3 py-1 text-sm font-semibold rounded-full backdrop-blur-md border ${getSocietyBadgeStyle(vacancy.society, true)}`}>
+                    {vacancy.society}
+                  </span>
+                )}
+              </div>
               <h1 className="text-3xl md:text-5xl font-bold text-white mb-2">{vacancy.title}</h1>
             </div>
           </div>

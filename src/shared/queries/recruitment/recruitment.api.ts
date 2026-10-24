@@ -10,6 +10,7 @@ import type {
   GetAllApplicationsParams,
   UpdateStatus,
   ExportApplicationsParams,
+  Society,
 } from '@/shared/types/recruitment.types';
 import {
   PaginationParams,
@@ -128,6 +129,7 @@ export const viewApplicationCV = async (
 
 export interface GetVacanciesParams extends PaginationParams {
   category_id?: string;
+  society?: Society;
 }
 
 export const getVacancies = async (
@@ -182,26 +184,30 @@ export const adminViewApplicationCv = async (
 
 export const uploadVacancyImage = async (
   vacancyId: string,
-  file: File,
+  file: File
 ): Promise<Vacancy> => {
   const formData = new FormData();
   formData.append('image', file);
   const response = await apiClient.post<ApiResponse<Vacancy>>(
     API_ENDPOINTS.RECRUITMENT.UPLOAD_VACANCY_IMAGE(vacancyId),
     formData,
-    { headers: { 'Content-Type': 'multipart/form-data' } },
+    { headers: { 'Content-Type': 'multipart/form-data' } }
   );
   return response.data.data;
 };
 
-export const deleteVacancyImage = async (vacancyId: string): Promise<Vacancy> => {
+export const deleteVacancyImage = async (
+  vacancyId: string
+): Promise<Vacancy> => {
   const response = await apiClient.delete<ApiResponse<Vacancy>>(
-    API_ENDPOINTS.RECRUITMENT.DELETE_VACANCY_IMAGE(vacancyId),
+    API_ENDPOINTS.RECRUITMENT.DELETE_VACANCY_IMAGE(vacancyId)
   );
   return response.data.data;
 };
 
-export const uploadApplicationFile = async (file: File): Promise<{ url: string }> => {
+export const uploadApplicationFile = async (
+  file: File
+): Promise<{ url: string }> => {
   const formData = new FormData();
   formData.append('file', file);
   const response = await apiClient.post<ApiResponse<{ url: string }>>(
@@ -213,6 +219,8 @@ export const uploadApplicationFile = async (file: File): Promise<{ url: string }
 };
 
 export const getVacancyById = async (id: string): Promise<Vacancy> => {
-  const response = await apiClient.get<ApiResponse<Vacancy>>(`/recruitment/vacancies/${id}`);
+  const response = await apiClient.get<ApiResponse<Vacancy>>(
+    `/recruitment/vacancies/${id}`
+  );
   return response.data.data;
 };

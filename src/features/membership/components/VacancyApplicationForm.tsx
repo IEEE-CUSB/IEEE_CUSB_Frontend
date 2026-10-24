@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '@/shared/store/hooks';
 import { Vacancy } from '@/shared/types/recruitment.types';
@@ -27,7 +27,13 @@ export const VacancyApplicationForm = ({ vacancy, isDark, onSuccess, onCancel, h
   const [pendingFiles, setPendingFiles] = useState<Record<string, File>>({});
 
   const applyMutation = useApplyToVacancy();
-  
+
+  const sortedQuestions = useMemo(() => {
+    if (!vacancy?.questions) return [];
+    return [...vacancy.questions].sort(
+      (a, b) => Number(a.order ?? 0) - Number(b.order ?? 0)
+    );
+  }, [vacancy?.questions]);
 
   const handleInputChange = (questionId: string, value: any) => {
     setAnswers(prev => ({ ...prev, [questionId]: value }));
@@ -57,9 +63,14 @@ export const VacancyApplicationForm = ({ vacancy, isDark, onSuccess, onCancel, h
     e.preventDefault();
     const newErrors: Record<string, string> = {};
 
-    vacancy.questions?.forEach(q => {
-      if (q.is_required && (!answers[q.id as string] || (Array.isArray(answers[q.id as string]) && answers[q.id as string].length === 0))) {
-        newErrors[q.id as string] = 'This question is required';
+    sortedQuestions.forEach(q => {
+      const qId = (q.id ?? q.question_text) as string;
+      if (
+        q.is_required &&
+        (!answers[qId] ||
+          (Array.isArray(answers[qId]) && answers[qId].length === 0))
+      ) {
+        newErrors[qId] = 'This question is required';
       }
     });
 
@@ -83,9 +94,19 @@ export const VacancyApplicationForm = ({ vacancy, isDark, onSuccess, onCancel, h
         }
       }
 
+      // Preserve question order in extra_data
+      const extra_data: Record<string, any> = {};
+      sortedQuestions.forEach(q => {
+        const qId = (q.id ?? q.question_text) as string;
+        if (finalAnswers[qId] !== undefined) {
+          const key = q.question_text || qId;
+          extra_data[key] = finalAnswers[qId];
+        }
+      });
+
       await applyMutation.mutateAsync({
         vacancyId: vacancy.id,
-        data: { extra_data: Object.fromEntries(Object.entries(finalAnswers).map(([qId, answer]) => [vacancy.questions?.find(q => q.id === qId)?.question_text || qId, answer])) }
+        data: { extra_data }
       });
       toast.success('Successfully applied to ' + vacancy.title);
       if (onSuccess) onSuccess();
@@ -134,8 +155,8 @@ export const VacancyApplicationForm = ({ vacancy, isDark, onSuccess, onCancel, h
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
-      {vacancy.questions?.sort((a, b) => (a.order || 0) - (b.order || 0)).map((q) => {
-        const qId = q.id as string;
+      {sortedQuestions.map((q) => {
+        const qId = (q.id ?? q.question_text) as string;
         return (
           <div key={qId} className="space-y-1">
             {q.type === 'TEXT' && (
@@ -221,7 +242,7 @@ export const VacancyApplicationForm = ({ vacancy, isDark, onSuccess, onCancel, h
         );
       })}
       
-      {(!vacancy.questions || vacancy.questions.length === 0) && (
+      {sortedQuestions.length === 0 && (
          <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'} py-4`}>
            No questions to answer. Click submit to apply with your CV.
          </p>
