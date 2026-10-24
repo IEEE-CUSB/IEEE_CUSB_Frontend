@@ -1,7 +1,8 @@
 import { useMemo, useState, useEffect } from 'react';
 import { type ColumnDef } from '@ieee-ui/ui';
-import { FiEdit2, FiTrash2, FiUsers } from 'react-icons/fi';
+import { FiEdit2, FiTrash2, FiUsers, FiShare2 } from 'react-icons/fi';
 import { CgWorkAlt } from 'react-icons/cg';
+import toast from 'react-hot-toast';
 import { useTheme } from '@/shared/hooks/useTheme';
 import { ConfirmDeleteModal } from '@/shared/components/ConfirmDeleteModal';
 import { AdminMobileCard } from '@/shared/components/AdminMobileCard';
@@ -21,7 +22,11 @@ import {
 } from '@/shared/queries/recruitment';
 import { AddEditVacancyModal } from './AddEditVacancyModal';
 import { VacancyApplicationsModal } from './VacancyApplicationsModal';
-import { stripHtmlToText, getSocietyBadgeStyle } from '@/shared/utils/helpers';
+import {
+  stripHtmlToText,
+  getSocietyBadgeStyle,
+  getVacancyShareUrl,
+} from '@/shared/utils/helpers';
 import { Toggle } from '@/shared/components/ui/Toggle';
 
 const VacanciesTab = () => {
@@ -214,6 +219,21 @@ const VacanciesTab = () => {
         cell: item => (
           <div className="flex items-center justify-end gap-2">
             <button
+              onClick={() => {
+                const url = getVacancyShareUrl(item.id);
+                navigator.clipboard.writeText(url);
+                toast.success('Vacancy link copied!');
+              }}
+              className={`p-2 rounded-lg transition-colors ${
+                isDark
+                  ? 'text-gray-500 hover:text-green-400 hover:bg-green-400/10'
+                  : 'text-gray-400 hover:text-green-600 hover:bg-green-50'
+              }`}
+              title="Copy Short Link"
+            >
+              <FiShare2 className="w-4 h-4" />
+            </button>
+            <button
               onClick={() => handleEdit(item)}
               className={`p-2 rounded-lg transition-colors ${
                 isDark
@@ -350,6 +370,16 @@ const VacanciesTab = () => {
               onEdit={() => handleEdit(vacancy)}
               onDelete={() => handleDeleteClick(vacancy)}
               extraActions={[
+                {
+                  icon: <FiShare2 className="w-3.5 h-3.5" />,
+                  label: 'Copy Link',
+                  onClick: () => {
+                    const url = getVacancyShareUrl(vacancy.id);
+                    navigator.clipboard.writeText(url);
+                    toast.success('Vacancy link copied!');
+                  },
+                  color: 'info',
+                },
                 {
                   icon: <FiUsers className="w-3.5 h-3.5" />,
                   label: 'Applications',
