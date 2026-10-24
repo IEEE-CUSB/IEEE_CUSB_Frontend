@@ -158,7 +158,7 @@ const VacanciesTab = () => {
                     isDark
                   )}`}
                 >
-                  {item.society}
+                  {item.society === 'MAIN' ? 'Main' : item.society}
                 </span>
               )}
             </div>
@@ -302,10 +302,11 @@ const VacanciesTab = () => {
             label: 'Society',
             placeholder: 'All Societies',
             options: [
-              { label: 'EMBS', value: 'EMBS' },
-              { label: 'PES', value: 'PES' },
-              { label: 'RAS', value: 'RAS' },
+              { label: 'Main Chapter', value: 'MAIN' },
               { label: 'CS', value: 'CS' },
+              { label: 'RAS', value: 'RAS' },
+              { label: 'PES', value: 'PES' },
+              { label: 'EMBS', value: 'EMBS' },
             ],
           },
         ]}
@@ -348,7 +349,11 @@ const VacanciesTab = () => {
                   minute: '2-digit',
                 }
               )}`}
-              badge={vacancy.society ? `${vacancy.society} · ${badgeText}` : badgeText}
+              badge={
+                vacancy.society
+                  ? `${vacancy.society === 'MAIN' ? 'Main' : vacancy.society} · ${badgeText}`
+                  : badgeText
+              }
               description={vacancy.description ? stripHtmlToText(vacancy.description) : undefined}
               avatar={
                 vacancy.image_url ? (

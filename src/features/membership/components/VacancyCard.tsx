@@ -75,7 +75,7 @@ export const VacancyCard = ({
             <span
               className={`text-xs font-semibold px-2.5 py-1 rounded-full border backdrop-blur-md shadow-sm ${getSocietyBadgeStyle(vacancy.society, isDark)}`}
             >
-              {vacancy.society}
+              {vacancy.society === 'MAIN' ? 'Main' : vacancy.society}
             </span>
           )}
           {categoryName && categoryName !== 'Other' ? (

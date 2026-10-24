@@ -109,6 +109,10 @@ export const getSocietyBadgeStyle = (
   isDark?: boolean
 ): string => {
   switch (society) {
+    case 'MAIN':
+      return isDark
+        ? 'bg-blue-500/20 text-blue-300 border-blue-500/30'
+        : 'bg-blue-50 text-blue-700 border-blue-200';
     case 'CS':
       return isDark
         ? 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30'

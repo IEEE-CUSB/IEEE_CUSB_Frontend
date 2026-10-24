@@ -116,7 +116,7 @@ export const VacancyDetailsPage = () => {
                 </span>
                 {vacancy.society && (
                   <span className={`inline-block px-3 py-1 text-sm font-semibold rounded-full backdrop-blur-md border ${getSocietyBadgeStyle(vacancy.society, true)}`}>
-                    {vacancy.society}
+                    {vacancy.society === 'MAIN' ? 'Main' : vacancy.society}
                   </span>
                 )}
               </div>

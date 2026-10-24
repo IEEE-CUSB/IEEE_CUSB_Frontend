@@ -53,11 +53,11 @@ interface FormValues {
 }
 
 const SOCIETY_OPTIONS = [
-  { label: 'None / General Chapter', value: 'NONE' },
-  { label: 'EMBS', value: 'EMBS' },
-  { label: 'PES', value: 'PES' },
-  { label: 'RAS', value: 'RAS' },
+  { label: 'Main Chapter', value: 'MAIN' },
   { label: 'CS', value: 'CS' },
+  { label: 'RAS', value: 'RAS' },
+  { label: 'PES', value: 'PES' },
+  { label: 'EMBS', value: 'EMBS' },
 ];
 
 const empty = (): FormValues => ({
@@ -67,7 +67,7 @@ const empty = (): FormValues => ({
   updated_at: '',
   is_open: true,
   category_id: '',
-  society: 'NONE',
+  society: 'MAIN',
   questions: [],
 });
 
@@ -88,7 +88,7 @@ const toForm = (v?: Vacancy): FormValues =>
         updated_at: formatDateForInput(v.updated_at),
         is_open: v.is_open,
         category_id: v.category_id ?? v.category?.id ?? '',
-        society: v.society || 'NONE',
+        society: v.society || 'MAIN',
         questions: v.questions
           ? [...v.questions]
               .sort((a, b) => Number(a.order ?? 0) - Number(b.order ?? 0))
@@ -387,10 +387,7 @@ export const AddEditVacancyModal: React.FC<
       description: formValues.description.trim(),
       is_open: formValues.is_open,
       category_id: formValues.category_id || null,
-      society:
-        formValues.society && formValues.society !== 'NONE'
-          ? (formValues.society as Society)
-          : null,
+      society: (formValues.society as Society) || 'MAIN',
       questions: formValues.questions.map((q, i) => {
         const isTemp =
           !q.id ||

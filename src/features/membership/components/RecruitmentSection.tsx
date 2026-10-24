@@ -30,7 +30,6 @@ import { useDebounce } from '@/shared/hooks/useDebounce';
 
 const CATEGORY_ALL = 'All';
 const SOCIETY_ALL = 'All';
-const SOCIETY_GENERAL = 'General';
 
 export const RecruitmentSection = () => {
   const { isDark } = useTheme();
@@ -63,7 +62,7 @@ export const RecruitmentSection = () => {
   const categories = categoriesPayload?.categories || [];
 
   const isSpecificSociety =
-    activeSociety !== SOCIETY_ALL && activeSociety !== SOCIETY_GENERAL;
+    activeSociety !== SOCIETY_ALL && activeSociety !== 'MAIN';
 
   const { data: vacanciesData = [], isLoading: isLoadingVacancies } =
     useGetVacancies({
@@ -83,8 +82,8 @@ export const RecruitmentSection = () => {
 
   const openVacancies = (vacanciesData as Vacancy[]).filter(v => {
     if (!v.is_open) return false;
-    if (activeSociety === SOCIETY_GENERAL) {
-      return !v.society;
+    if (activeSociety === 'MAIN') {
+      return v.society === 'MAIN' || !v.society;
     }
     return true;
   });
@@ -287,8 +286,9 @@ export const RecruitmentSection = () => {
                   Society:
                 </span>
                 <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 -mx-1 px-1 no-scrollbar">
-                  {[SOCIETY_ALL, SOCIETY_GENERAL, ...SOCIETIES].map(soc => {
+                  {[SOCIETY_ALL, ...SOCIETIES].map(soc => {
                     const isActive = activeSociety === soc;
+                    const label = soc === 'MAIN' ? 'Main' : soc;
                     return (
                       <motion.button
                         key={soc}
@@ -304,7 +304,7 @@ export const RecruitmentSection = () => {
                               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                         }`}
                       >
-                        {soc}
+                        {label}
                       </motion.button>
                     );
                   })}

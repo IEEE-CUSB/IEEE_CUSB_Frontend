@@ -14,8 +14,8 @@ export interface PaginatedResponse<T> {
   message?: string;
 }
 
-export type Society = 'EMBS' | 'PES' | 'RAS' | 'CS';
-export const SOCIETIES: Society[] = ['EMBS', 'PES', 'RAS', 'CS'];
+export type Society = 'MAIN' | 'CS' | 'RAS' | 'PES' | 'EMBS';
+export const SOCIETIES: Society[] = ['MAIN', 'CS', 'RAS', 'PES', 'EMBS'];
 
 export enum ApplicationStatus {
   PENDING = 'PENDING',
