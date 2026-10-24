@@ -4,10 +4,11 @@ import { MemberCard, MemberCardSize } from '@/shared/components/MemberCard';
 import { IoMail } from 'react-icons/io5';
 import { FaFacebookF, FaLinkedinIn, FaInstagram } from 'react-icons/fa';
 import { useEffect, useState } from 'react';
+// import ElectricBorder from '@/components/ui/ElectricBorder';
 
 const useResponsiveSize = (
   breakpoints = [
-    { maxWidth: 640, size: '2xs' as MemberCardSize },
+    { maxWidth: 640, size: 'xs' as MemberCardSize },
     { maxWidth: 1024, size: 'xs' as MemberCardSize },
   ],
   defaultSize: MemberCardSize = 'sm'
@@ -52,7 +53,10 @@ export const ChaptersSection = () => {
         <div className="flex flex-col gap-16">
           {CHAPTERS.map((chapter, index) => (
             <SectionReveal key={chapter.slug} delay={index * 0.1}>
-              <div className="bg-card rounded-2xl p-8 border border-border/50 shadow-[0_4px_24px_rgba(0,0,0,0.02)]">
+              <div
+                className="rounded-2xl border-2 bg-background/50 p-8 shadow-lg backdrop-blur-sm"
+                style={{ borderColor: chapter.borderColor ?? '#1E293B' }}
+              >
                 <div className="flex flex-col lg:flex-row gap-12 items-start">
                   <div className="flex-1">
                     <div className="flex items-center gap-4 mb-6">
@@ -125,16 +129,17 @@ export const ChaptersSection = () => {
 
                   {/* Board Members */}
                   {chapter.board.length > 0 && (
-                    <div className="w-full lg:w-auto bg-background/50 rounded-lg p-6 border border-border/50">
+                    <div className="w-full lg:w-auto rounded-lg p-6">
                       <h4 className="text-xl font-semibold text-foreground mb-6 text-center">
                         Board Members
                       </h4>
-                      <div className="grid grid-cols-3 gap-2 lg:flex lg:flex-wrap lg:gap-6 lg:justify-center lg:grid-cols-none">
+                      <div className="flex max-w-xs sm:max-w-md lg:max-w-xl mx-auto flex-wrap justify-center gap-x-16 gap-y-2 sm:gap-6">
                         {chapter.board.map((member, i) => (
                           <MemberCard
                             key={member.name}
                             member={member}
                             size={boardCardSize}
+                            roleOverride={member.role.replace('-', '\u2011')}
                             delay={0.2 + i * 0.1}
                           />
                         ))}
@@ -143,6 +148,7 @@ export const ChaptersSection = () => {
                   )}
                 </div>
               </div>
+              {/* </ElectricBorder> */}
             </SectionReveal>
           ))}
         </div>
