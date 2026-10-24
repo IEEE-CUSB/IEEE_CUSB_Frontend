@@ -78,7 +78,7 @@ const routes: RouteObject[] = [
       },
       {
         path: 'users',
-        element: <UnderConstructionPage />, // Users - Working
+        element: <UnderConstructionPage />, // Users - Under Construction
       },
       {
         path: 'recruitment',
@@ -122,6 +122,11 @@ const routes: RouteObject[] = [
         path: 'join',
         element: <MembershipPage />,
       },
+      {
+        path: 'v/:id',
+        element: <VacancyDetailsPage />,
+      },
+      // TODO: Legacy recruitment/vacancies/:id route kept for backward compatibility (users with old copied URLs). Remove this route later.
       {
         path: 'recruitment/vacancies/:id',
         element: <VacancyDetailsPage />,
