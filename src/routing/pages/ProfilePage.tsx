@@ -224,8 +224,8 @@ export const ProfilePage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background py-8 md:py-16">
-      <div className="mx-auto max-w-6xl px-4 md:px-6">
+    <div className="min-h-screen min-w-0 bg-background py-8 md:py-16">
+      <div className="mx-auto w-full max-w-6xl min-w-0 px-2 sm:px-4 md:px-6">
         {/* Back Button */}
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <motion.button
@@ -252,36 +252,36 @@ export const ProfilePage = () => {
           </button>
         </div>
 
-        <div className="overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
-          <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-background px-6 py-8 md:px-10 md:py-10">
+        <div className="min-w-0 overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
+          <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-background px-4 py-8 sm:px-6 md:px-10 md:py-10">
             <div className="flex flex-col gap-6 md:flex-row md:items-center">
               <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary text-2xl font-semibold text-primary-foreground">
                 {initials}
               </div>
-              <div>
-                <h1 className="mt-2 text-3xl font-semibold text-foreground">
+              <div className="min-w-0">
+                <h1 className="mt-2 break-words text-3xl font-semibold text-foreground">
                   {user.name}
                 </h1>
-                <p className="mt-1 text-sm text-muted-foreground">
+                <p className="mt-1 break-all text-sm text-muted-foreground">
                   @{user.username}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="grid gap-6 p-6 md:grid-cols-[1.1fr_0.9fr] md:p-8">
-            <div className="space-y-6">
-              <div className="rounded-2xl border border-border bg-background/70 p-5">
+          <div className="grid min-w-0 gap-4 p-3 sm:gap-6 sm:p-6 md:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] md:p-8">
+            <div className="min-w-0 space-y-6">
+              <div className="min-w-0 rounded-2xl border border-border bg-background/70 p-4 sm:p-5">
                 <div className="flex items-center gap-2 text-lg font-semibold text-foreground">
                   <UserCircle2 className="h-5 w-5 text-primary" />
                   About
                 </div>
-                <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                <p className="mt-3 break-words text-sm leading-7 text-muted-foreground">
                   {user.bio || 'No bio added yet.'}
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-border bg-background/70 p-5">
+              <div className="min-w-0 rounded-2xl border border-border bg-background/70 p-4 sm:p-5">
                 <div className="flex items-center gap-2 text-lg font-semibold text-foreground">
                   <BadgeCheck className="h-5 w-5 text-primary" />
                   Account details
@@ -290,13 +290,13 @@ export const ProfilePage = () => {
                   {profileDetails.map(({ label, value, icon: Icon }) => (
                     <div
                       key={label}
-                      className="rounded-xl border border-border bg-background px-3 py-3"
+                      className="min-w-0 rounded-xl border border-border bg-background px-3 py-3"
                     >
                       <div className="flex items-center gap-2 text-sm font-medium text-foreground">
                         <Icon className="h-4 w-4 text-primary" />
                         {label}
                       </div>
-                      <p className="mt-2 text-sm text-muted-foreground">
+                      <p className="mt-2 break-words text-sm text-muted-foreground">
                         {formatValue(value)}
                       </p>
                     </div>
@@ -305,14 +305,14 @@ export const ProfilePage = () => {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-border bg-background/70 p-5">
+            <div className="min-w-0 rounded-2xl border border-border bg-background/70 p-4 sm:p-5">
               <div className="flex items-center gap-2 text-lg font-semibold text-foreground">
                 <FileText className="h-5 w-5 text-primary" />
                 CV
               </div>
               {hasCv ? (
                 <div className="mt-5 rounded-xl border border-dashed border-border bg-background p-4">
-                  <p className="text-sm font-semibold text-foreground">
+                  <p className="break-words text-sm font-semibold text-foreground">
                     {user.name.replace(/\s+/g, '_')}_CV.pdf
                   </p>
                   <p className="mt-1 text-xs text-muted-foreground">PDF document</p>
@@ -366,11 +366,11 @@ export const ProfilePage = () => {
                           const eventName = eventsData?.data.find(e => e.id === reg.event_id)?.title;
                           return (
                             <li key={reg.id} className="text-sm bg-background rounded-xl p-3 border border-border flex flex-col gap-2 shadow-sm">
-                              <div className="flex justify-between items-center w-full">
-                                <span className="font-medium text-foreground truncate mr-2" title={eventName || reg.event_id}>
+                              <div className="flex min-w-0 items-center justify-between gap-2">
+                                <span className="min-w-0 truncate font-medium text-foreground" title={eventName || reg.event_id}>
                                   {eventName || `ID: ${reg.event_id.split('-')[0]}`}
                                 </span>
-                                <span className={`font-bold px-2.5 py-1 border rounded-md text-[10px] uppercase tracking-wider whitespace-nowrap ${getStatusBadgeClass(reg.status)}`}>
+                                <span className={`shrink-0 whitespace-nowrap rounded-md border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${getStatusBadgeClass(reg.status)}`}>
                                   {reg.status}
                                 </span>
                               </div>
@@ -395,11 +395,11 @@ export const ProfilePage = () => {
                           const workshopName = workshopsData?.data.find(w => w.id === reg.workshop_id)?.title;
                           return (
                             <li key={reg.id} className="text-sm bg-background rounded-xl p-3 border border-border flex flex-col gap-2 shadow-sm">
-                              <div className="flex justify-between items-center w-full">
-                                <span className="font-medium text-foreground truncate mr-2" title={workshopName || reg.workshop_id}>
+                              <div className="flex min-w-0 items-center justify-between gap-2">
+                                <span className="min-w-0 truncate font-medium text-foreground" title={workshopName || reg.workshop_id}>
                                   {workshopName || `ID: ${reg.workshop_id.split('-')[0]}`}
                                 </span>
-                                <span className={`font-bold px-2.5 py-1 border rounded-md text-[10px] uppercase tracking-wider whitespace-nowrap ${getStatusBadgeClass(reg.status)}`}>
+                                <span className={`shrink-0 whitespace-nowrap rounded-md border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${getStatusBadgeClass(reg.status)}`}>
                                   {reg.status}
                                 </span>
                               </div>
@@ -424,11 +424,11 @@ export const ProfilePage = () => {
                           const vacancyName = vacanciesData?.find(v => v.id === app.vacancy_id)?.title;
                           return (
                             <li key={app.id} className="text-sm bg-background rounded-xl p-3 border border-border flex flex-col gap-2 shadow-sm">
-                              <div className="flex justify-between items-center w-full">
-                                <span className="font-medium text-foreground truncate mr-2" title={vacancyName || app.vacancy_id}>
+                              <div className="flex min-w-0 items-center justify-between gap-2">
+                                <span className="min-w-0 truncate font-medium text-foreground" title={vacancyName || app.vacancy_id}>
                                   {vacancyName || `ID: ${app.vacancy_id.split('-')[0]}`}
                                 </span>
-                                <span className={`font-bold px-2.5 py-1 border rounded-md text-[10px] uppercase tracking-wider whitespace-nowrap ${getStatusBadgeClass(app.status)}`}>
+                                <span className={`shrink-0 whitespace-nowrap rounded-md border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${getStatusBadgeClass(app.status)}`}>
                                   {app.status}
                                 </span>
                               </div>
@@ -451,10 +451,10 @@ export const ProfilePage = () => {
 
       {isEditModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-6">
-          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl border border-border bg-card p-6 shadow-2xl">
+          <div className="w-full max-w-2xl min-w-0 max-h-[90vh] overflow-y-auto rounded-3xl border border-border bg-card p-4 shadow-2xl sm:p-6">
             <div className="flex items-start justify-between gap-3">
-              <div>
-                <h2 className="text-xl font-semibold text-foreground">
+              <div className="min-w-0">
+                <h2 className="break-words text-xl font-semibold text-foreground">
                   Edit personal information
                 </h2>
                 <p className="mt-1 text-sm text-muted-foreground">
@@ -471,7 +471,7 @@ export const ProfilePage = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid min-w-0 gap-4 md:grid-cols-2">
                 <label className="block text-sm font-medium text-foreground">
                   <span className="mb-2 block">Full name</span>
                   <input
@@ -572,18 +572,18 @@ export const ProfilePage = () => {
                 />
               </label>
 
-              <div className="rounded-2xl border border-border bg-background/70 p-4">
+              <div className="min-w-0 rounded-2xl border border-border bg-background/70 p-4">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
+                  <div className="min-w-0">
                     <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
                       <FileText className="h-4 w-4 text-primary" />
                       CV
                     </div>
-                    <p className="mt-1 text-xs text-muted-foreground">
+                    <p className="mt-1 break-words text-xs text-muted-foreground">
                       {hasCv ? `${user.name.replace(/\s+/g, '_')}_CV.pdf` : 'Upload your CV as a PDF.'}
                     </p>
                   </div>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex min-w-0 flex-wrap gap-2">
                     <label className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition disabled:opacity-70">
                       {uploadCvMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
                       {hasCv ? 'Replace CV' : 'Upload CV'}
