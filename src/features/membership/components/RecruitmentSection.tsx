@@ -61,13 +61,16 @@ export const RecruitmentSection = () => {
   });
   const categories = categoriesPayload?.categories || [];
 
+  const isSpecificSociety =
+    activeSociety !== SOCIETY_ALL && activeSociety !== 'MAIN';
+
   const { data: vacanciesData = [], isLoading: isLoadingVacancies } =
     useGetVacancies({
       search: debouncedSearch,
       ...(activeCategoryId !== CATEGORY_ALL
         ? { category_id: activeCategoryId }
         : {}),
-      ...(activeSociety !== SOCIETY_ALL
+      ...(isSpecificSociety
         ? { society: activeSociety as Society }
         : {}),
     } as any);
@@ -77,7 +80,13 @@ export const RecruitmentSection = () => {
     myApplicationsData?.vacancyApplications || [];
   const revokeMutation = useRevokeApplication();
 
-  const openVacancies = (vacanciesData as Vacancy[]).filter(v => v.is_open);
+  const openVacancies = (vacanciesData as Vacancy[]).filter(v => {
+    if (!v.is_open) return false;
+    if (activeSociety === 'MAIN') {
+      return v.society === 'MAIN' || !v.society;
+    }
+    return true;
+  });
   const appliedVacancyIds = new Set(
     myApplications.map((a: Application) => a.vacancy_id)
   );
@@ -125,7 +134,8 @@ export const RecruitmentSection = () => {
 
   return (
     <section
-      className={`py-16 md:py-24 px-6 ${isDark ? 'bg-gray-900' : 'bg-background'}`}
+      id="positions"
+      className={`py-16 md:py-24 px-6 scroll-mt-20 ${isDark ? 'bg-gray-900' : 'bg-background'}`}
     >
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
@@ -278,6 +288,7 @@ export const RecruitmentSection = () => {
                 <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 -mx-1 px-1 no-scrollbar">
                   {[SOCIETY_ALL, ...SOCIETIES].map(soc => {
                     const isActive = activeSociety === soc;
+                    const label = soc === 'MAIN' ? 'Main' : soc;
                     return (
                       <motion.button
                         key={soc}
@@ -293,7 +304,7 @@ export const RecruitmentSection = () => {
                               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                         }`}
                       >
-                        {soc}
+                        {label}
                       </motion.button>
                     );
                   })}

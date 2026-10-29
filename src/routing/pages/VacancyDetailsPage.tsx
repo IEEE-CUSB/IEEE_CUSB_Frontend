@@ -1,27 +1,49 @@
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useVacancyById } from '@/shared/queries/recruitment/recruitment.queries';
 import { useTheme } from '@/shared/hooks/useTheme';
-import { HiBriefcase, HiArrowLeft } from 'react-icons/hi';
+import { HiBriefcase, HiArrowLeft, HiOutlineShare, HiCheck } from 'react-icons/hi';
 import { Button } from '@ieee-ui/ui';
 import { Loader } from '@ieee-ui/ui';
 import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 import { VacancyApplicationForm } from '@/features/membership/components/VacancyApplicationForm';
 import { useAppSelector } from '@/shared/store/hooks';
 import { useGetUserApplications } from '@/shared/queries/users/users.queries';
 import { Application } from '@/shared/types/recruitment.types';
-import { getSocietyBadgeStyle } from '@/shared/utils/helpers';
+import {
+  getSocietyBadgeStyle,
+  shortIdToUuid,
+  getVacancyShareUrl,
+} from '@/shared/utils/helpers';
 
 export const VacancyDetailsPage = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id: rawId } = useParams<{ id: string }>();
+  // Decodes 22-char shortId back to standard UUID, or passes valid UUID through as-is
+  const id = rawId ? shortIdToUuid(rawId) : '';
   const navigate = useNavigate();
   const { isDark } = useTheme();
   const { isAuthenticated } = useAppSelector((state) => state.auth);
+  const [copied, setCopied] = useState(false);
   
-  const { data: vacancy, isLoading, error } = useVacancyById(id!);
+  const { data: vacancy, isLoading, error } = useVacancyById(id);
   
   // Need to check if user has already applied
   const { data: myApplicationsData } = useGetUserApplications();
   const hasApplied = isAuthenticated && myApplicationsData?.vacancyApplications?.some((app: Application) => app.vacancy_id === id);
+
+  const handleCopyLink = async () => {
+    if (!vacancy) return;
+    const url = getVacancyShareUrl(vacancy.id);
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      toast.success('Vacancy link copied to clipboard!');
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error('Failed to copy link');
+    }
+  };
 
   if (isLoading) {
     return (
@@ -45,12 +67,29 @@ export const VacancyDetailsPage = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl min-h-screen mt-24">
-      <button 
-        onClick={() => navigate('/join')}
-        className={`flex items-center gap-2 mb-6 text-sm font-medium transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-900'}`}
-      >
-        <HiArrowLeft className="w-4 h-4" /> Back to Vacancies
-      </button>
+      <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
+        <button 
+          onClick={() => navigate('/join')}
+          className={`flex items-center gap-2 text-sm font-medium transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-900'}`}
+        >
+          <HiArrowLeft className="w-4 h-4" /> Back to Vacancies
+        </button>
+
+        <button
+          onClick={handleCopyLink}
+          className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+            copied
+              ? 'bg-green-500/10 text-green-500 border border-green-500/20'
+              : isDark
+                ? 'bg-gray-800 text-gray-300 hover:text-white border border-gray-700 hover:border-gray-600'
+                : 'bg-white text-gray-700 hover:text-primary border border-gray-200 hover:border-primary/30 shadow-sm'
+          }`}
+          title="Copy short vacancy link"
+        >
+          {copied ? <HiCheck className="w-4 h-4 text-green-500" /> : <HiOutlineShare className="w-4 h-4" />}
+          <span>{copied ? 'Copied!' : 'Copy Link'}</span>
+        </button>
+      </div>
 
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
@@ -77,7 +116,7 @@ export const VacancyDetailsPage = () => {
                 </span>
                 {vacancy.society && (
                   <span className={`inline-block px-3 py-1 text-sm font-semibold rounded-full backdrop-blur-md border ${getSocietyBadgeStyle(vacancy.society, true)}`}>
-                    {vacancy.society}
+                    {vacancy.society === 'MAIN' ? 'Main' : vacancy.society}
                   </span>
                 )}
               </div>

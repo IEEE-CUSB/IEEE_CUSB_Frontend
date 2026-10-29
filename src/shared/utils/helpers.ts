@@ -109,25 +109,35 @@ export const getSocietyBadgeStyle = (
   isDark?: boolean
 ): string => {
   switch (society) {
-    case 'CS':
+    case 'MAIN':
       return isDark
         ? 'bg-blue-500/20 text-blue-300 border-blue-500/30'
         : 'bg-blue-50 text-blue-700 border-blue-200';
+    case 'CS':
+      return isDark
+        ? 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30'
+        : 'bg-yellow-50 text-yellow-700 border-yellow-200';
     case 'RAS':
       return isDark
         ? 'bg-rose-500/20 text-rose-300 border-rose-500/30'
         : 'bg-rose-50 text-rose-700 border-rose-200';
     case 'PES':
       return isDark
-        ? 'bg-amber-500/20 text-amber-300 border-amber-500/30'
-        : 'bg-amber-50 text-amber-700 border-amber-200';
-    case 'EMBS':
-      return isDark
         ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
         : 'bg-emerald-50 text-emerald-700 border-emerald-200';
+    case 'EMBS':
+      return isDark
+        ? 'bg-purple-500/20 text-purple-300 border-purple-500/30'
+        : 'bg-purple-50 text-purple-700 border-purple-200';
     default:
       return isDark
         ? 'bg-gray-500/20 text-gray-300 border-gray-500/30'
         : 'bg-gray-100 text-gray-700 border-gray-200';
   }
 };
+
+export {
+  uuidToShortId,
+  shortIdToUuid,
+  getVacancyShareUrl,
+} from './shortId';

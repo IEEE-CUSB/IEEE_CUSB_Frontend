@@ -1,19 +1,34 @@
 import { PageHeroSection } from '@/shared/components/PageHeroSection';
 
-export const MembershipHeroSection = () => {
+interface MembershipHeroSectionProps {
+  onJoinClick?: () => void;
+}
+
+export const MembershipHeroSection = ({ onJoinClick }: MembershipHeroSectionProps) => {
+  const handleJoinClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (onJoinClick) {
+      onJoinClick();
+    } else {
+      const el = document.getElementById('positions');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
+
   return (
     <PageHeroSection
       eyebrow="Join • Connect • Grow"
-      title="Become an IEEE Member"
+      title="Become an IEEE CUSB Member"
       description="Join a global community of technology professionals, build your network, access exclusive resources, and accelerate your career. Take the first step towards shaping the future of engineering."
       ctaContent={
         <a
-          href="https://www.ieee.org/membership/join/index.html"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-block bg-primary text-white px-8 py-4 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+          href="#positions"
+          onClick={handleJoinClick}
+          className="inline-block bg-primary text-white px-8 py-4 rounded-lg font-semibold hover:bg-primary/90 transition-colors cursor-pointer"
         >
-          Join IEEE Now →
+          Join Now →
         </a>
       }
     />

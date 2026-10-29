@@ -1,9 +1,15 @@
 import { motion } from 'framer-motion';
-import { HiBriefcase, HiChevronRight } from 'react-icons/hi';
+import { HiBriefcase, HiChevronRight, HiOutlineShare } from 'react-icons/hi';
 import { useTheme } from '@/shared/hooks/useTheme';
 import { Vacancy } from '@/shared/types/recruitment.types';
 import { useNavigate } from 'react-router-dom';
-import { stripHtmlToText, getSocietyBadgeStyle } from '@/shared/utils/helpers';
+import toast from 'react-hot-toast';
+import {
+  stripHtmlToText,
+  getSocietyBadgeStyle,
+  uuidToShortId,
+  getVacancyShareUrl,
+} from '@/shared/utils/helpers';
 
 const CATEGORY_COLORS: Record<string, string> = {
   Technical: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
@@ -37,7 +43,7 @@ export const VacancyCard = ({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-50px' }}
       whileHover={{ y: -4, transition: { duration: 0.2 } }}
-      onClick={() => navigate(`/recruitment/vacancies/${vacancy.id}`)}
+      onClick={() => navigate(`/v/${uuidToShortId(vacancy.id)}`)}
       className={`cursor-pointer relative flex flex-col rounded-2xl overflow-hidden border transition-all duration-300 ${
         isDark
           ? 'bg-gray-800 border-gray-700 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/10'
@@ -69,7 +75,7 @@ export const VacancyCard = ({
             <span
               className={`text-xs font-semibold px-2.5 py-1 rounded-full border backdrop-blur-md shadow-sm ${getSocietyBadgeStyle(vacancy.society, isDark)}`}
             >
-              {vacancy.society}
+              {vacancy.society === 'MAIN' ? 'Main' : vacancy.society}
             </span>
           )}
           {categoryName && categoryName !== 'Other' ? (
@@ -105,28 +111,47 @@ export const VacancyCard = ({
         )}
 
         <div className="mt-4 flex items-center justify-between gap-3">
-          {hasApplied ? (
-            <span
-              className={`text-xs font-semibold px-3 py-1.5 rounded-lg border ${
-                isDark
-                  ? 'bg-green-900/30 text-green-300 border-green-500/30'
-                  : 'bg-green-50 text-green-700 border-green-200'
-              }`}
-            >
-              ✓ Applied
-            </span>
-          ) : (
-            <button
-              onClick={e => {
-                e.stopPropagation();
-                onApply(vacancy);
-              }}
-              className="flex items-center gap-1.5 bg-primary text-white text-sm font-semibold px-4 py-2 rounded-xl hover:bg-primary/90 active:scale-95 transition-all duration-200 shadow-sm shadow-primary/30"
-            >
-              Apply Now
-              <HiChevronRight className="w-4 h-4" />
-            </button>
-          )}
+          <div className="flex items-center gap-2">
+            {hasApplied ? (
+              <span
+                className={`text-xs font-semibold px-3 py-1.5 rounded-lg border ${
+                  isDark
+                    ? 'bg-green-900/30 text-green-300 border-green-500/30'
+                    : 'bg-green-50 text-green-700 border-green-200'
+                }`}
+              >
+                ✓ Applied
+              </span>
+            ) : (
+              <button
+                onClick={e => {
+                  e.stopPropagation();
+                  onApply(vacancy);
+                }}
+                className="flex items-center gap-1.5 bg-primary text-white text-sm font-semibold px-4 py-2 rounded-xl hover:bg-primary/90 active:scale-95 transition-all duration-200 shadow-sm shadow-primary/30"
+              >
+                Apply Now
+                <HiChevronRight className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+
+          <button
+            onClick={e => {
+              e.stopPropagation();
+              const url = getVacancyShareUrl(vacancy.id);
+              navigator.clipboard.writeText(url);
+              toast.success('Vacancy link copied!');
+            }}
+            className={`p-2 rounded-xl border transition-colors cursor-pointer ${
+              isDark
+                ? 'text-gray-400 hover:text-white border-gray-700 hover:bg-gray-700/60'
+                : 'text-gray-500 hover:text-primary border-gray-200 hover:bg-gray-50'
+            }`}
+            title="Copy short link"
+          >
+            <HiOutlineShare className="w-4 h-4" />
+          </button>
         </div>
       </div>
     </motion.div>
