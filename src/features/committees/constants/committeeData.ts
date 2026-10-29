@@ -54,7 +54,7 @@ export const CHAPTERS: Chapter[] = [
     name: 'WIE',
     fullName: 'Women in Engineering',
     slug: 'wie',
-    logo: '/chapters/WIE.jpg',
+    logo: '/chapters/WIE.png',
     description:
       'IEEE Women in Engineering (WIE) is one of the largest international professional organizations dedicated to promoting women engineers and scientists, and inspiring girls around the world to follow their academic interests in a career in engineering.',
     board: [],
@@ -64,7 +64,7 @@ export const CHAPTERS: Chapter[] = [
     name: 'EMBS',
     fullName: 'Engineering in Medicine and Biology Society',
     slug: 'embs',
-    logo: '/chapters/EMBS.jpg',
+    logo: '/chapters/EMBS.png',
     description:
       "The IEEE Engineering in Medicine and Biology Society (EMBS) is the world's largest international society of biomedical engineers. Our mission is to advance the application of engineering sciences and technology to medicine and biology.",
     email: 'embs@ieeecusb.org',
@@ -176,7 +176,7 @@ export const CHAPTERS: Chapter[] = [
     name: 'PES',
     fullName: 'Power & Energy Society',
     slug: 'pes',
-    logo: '/chapters/PES.jpg',
+    logo: '/chapters/PES.png',
 
     description:
       'The IEEE Power & Energy Society (PES) is a leading professional organization dedicated to the advancement of power and energy technologies. Our mission is to promote the development and application of innovative solutions in the field of power and energy systems.',
