@@ -117,6 +117,14 @@ export const VacancyApplicationForm = ({ vacancy, isDark, onSuccess, onCancel, h
     }
   };
 
+  if (!vacancy.is_open) {
+    return (
+      <div className={`text-center p-6 rounded-xl border ${isDark ? 'border-red-900/40 bg-red-900/20' : 'border-red-200 bg-red-50'}`}>
+        <p className={`text-sm font-medium ${isDark ? 'text-red-300' : 'text-red-700'}`}>This position is currently closed for applications.</p>
+      </div>
+    );
+  }
+
   if (!isAuthenticated) {
     return (
       <div className={`text-center p-8 rounded-xl border ${isDark ? 'border-gray-700 bg-gray-900/50' : 'border-gray-200 bg-gray-50'}`}>

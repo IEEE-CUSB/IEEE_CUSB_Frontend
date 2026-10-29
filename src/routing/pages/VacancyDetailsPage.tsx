@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useVacancyById } from '@/shared/queries/recruitment/recruitment.queries';
 import { useTheme } from '@/shared/hooks/useTheme';
-import { HiBriefcase, HiArrowLeft, HiOutlineShare, HiCheck } from 'react-icons/hi';
+import { HiBriefcase, HiArrowLeft, HiOutlineShare, HiCheck, HiXCircle } from 'react-icons/hi';
 import { Button } from '@ieee-ui/ui';
 import { Loader } from '@ieee-ui/ui';
 import { motion } from 'framer-motion';
@@ -119,6 +119,15 @@ export const VacancyDetailsPage = () => {
                     {vacancy.society === 'MAIN' ? 'Main' : vacancy.society}
                   </span>
                 )}
+                <span
+                  className={`inline-block px-3 py-1 text-sm font-semibold rounded-full backdrop-blur-md border ${
+                    vacancy.is_open
+                      ? 'bg-green-500/20 text-green-300 border-green-500/30'
+                      : 'bg-red-500/20 text-red-300 border-red-500/30'
+                  }`}
+                >
+                  {vacancy.is_open ? 'Open' : 'Closed'}
+                </span>
               </div>
               <h1 className="text-3xl md:text-5xl font-bold text-white mb-2">{vacancy.title}</h1>
             </div>
@@ -140,16 +149,43 @@ export const VacancyDetailsPage = () => {
               )}
             </div>
 
-            {/* Right side: Apply Form (embedded) */}
+            {/* Right side: Apply Form (embedded) or Closed Notice */}
             <div className="w-full lg:w-[400px] flex-shrink-0">
               <div className={`sticky top-24 p-6 rounded-2xl border shadow-sm ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
-                <h2 className={`text-xl font-bold mb-6 ${isDark ? 'text-white' : 'text-gray-900'}`}>Apply for this Role</h2>
-                <VacancyApplicationForm
-                  vacancy={vacancy}
-                  isDark={isDark}
-                  hasApplied={hasApplied}
-                  onSuccess={() => navigate('/join')}
-                />
+                {vacancy.is_open ? (
+                  <>
+                    <h2 className={`text-xl font-bold mb-6 ${isDark ? 'text-white' : 'text-gray-900'}`}>Apply for this Role</h2>
+                    <VacancyApplicationForm
+                      vacancy={vacancy}
+                      isDark={isDark}
+                      hasApplied={hasApplied}
+                      onSuccess={() => navigate('/join')}
+                    />
+                  </>
+                ) : (
+                  <div className="text-center py-4">
+                    <div
+                      className={`w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 ${
+                        isDark ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-red-50 text-red-600 border border-red-200'
+                      }`}
+                    >
+                      <HiXCircle className="w-8 h-8" />
+                    </div>
+                    <h2 className={`text-xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                      Applications Closed
+                    </h2>
+                    <p className={`text-sm mb-6 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                      This vacancy is currently closed and is no longer accepting submissions.
+                    </p>
+                    <Button
+                      buttonText="Back to Vacancies"
+                      onClick={() => navigate('/join')}
+                      type="primary"
+                      darkMode={isDark}
+                      width="full"
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </div>
