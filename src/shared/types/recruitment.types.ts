@@ -87,6 +87,7 @@ export interface UpdateVacancy {
 
 export interface UpdateStatus {
   status?: ApplicationStatus;
+  message?: string;
 }
 
 export interface GetAllApplicationsParams {

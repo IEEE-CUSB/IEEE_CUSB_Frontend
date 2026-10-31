@@ -11,11 +11,15 @@ import {
 import { FaUser } from 'react-icons/fa';
 import { useTheme } from '@/shared/hooks/useTheme';
 import { MobileVacancyApplicationsCard } from './MobileVacancyApplicationsCard';
+import { AcceptApplicationModal } from './AcceptApplicationModal';
 import {
   Application,
   ApplicationStatus,
 } from '@/shared/types/recruitment.types';
-import { useGetAllApplications, useUpdateApplicationStatus } from '@/shared/queries/recruitment/recruitment.queries';
+import {
+  useGetAllApplications,
+  useUpdateApplicationStatus,
+} from '@/shared/queries/recruitment/recruitment.queries';
 import { useDebounce } from '@/shared/hooks/useDebounce';
 import UniversityList from '@/constants/universityList';
 
@@ -71,7 +75,7 @@ export const VacancyApplicationsModal = ({
   const dateFilteredApplications = useMemo(() => {
     return !startDate && !endDate
       ? applications
-        : applications.filter((app: Application) => {
+      : applications.filter((app: Application) => {
           // Date filter
           const applicationDate = new Date(app.created_at);
 
@@ -81,10 +85,11 @@ export const VacancyApplicationsModal = ({
           const matchesEnd = !endDate || applicationDate <= new Date(endDate);
 
           const searchLower = debouncedSearch.toLowerCase();
-          const matchesSearch = !searchLower || 
-            (app.user?.name?.toLowerCase().includes(searchLower)) ||
-            (app.user?.email?.toLowerCase().includes(searchLower)) ||
-            (app.user_id.toLowerCase().includes(searchLower));
+          const matchesSearch =
+            !searchLower ||
+            app.user?.name?.toLowerCase().includes(searchLower) ||
+            app.user?.email?.toLowerCase().includes(searchLower) ||
+            app.user_id.toLowerCase().includes(searchLower);
 
           return matchesStart && matchesEnd && matchesSearch;
         });
@@ -93,19 +98,39 @@ export const VacancyApplicationsModal = ({
   // Transform and filter applications based on the active filter
   const getFilteredApplications = () => {
     if (activeApps === 'ALL') return dateFilteredApplications;
-    return dateFilteredApplications.filter((app: Application) => app.status === activeApps);
+    return dateFilteredApplications.filter(
+      (app: Application) => app.status === activeApps
+    );
   };
 
   const filteredApplications = getFilteredApplications();
 
+  const [acceptingApplication, setAcceptingApplication] =
+    useState<Application | null>(null);
+
   const handleUpdateStatus = async (
     applicationId: string,
-    status: ApplicationStatus
+    status: ApplicationStatus,
+    message?: string
   ) => {
     await updateStatus({
       id: applicationId,
-      data: { status },
+      data: { status, message },
     });
+  };
+
+  const handleConfirmAccept = async (message?: string) => {
+    if (!acceptingApplication) return;
+    try {
+      await handleUpdateStatus(
+        acceptingApplication.id,
+        ApplicationStatus.ACCEPTED,
+        message
+      );
+      setAcceptingApplication(null);
+    } catch {
+      // Error handled by mutation toast
+    }
   };
 
   const [selectedApplication, setSelectedApplication] = useState<Application>(
@@ -193,9 +218,7 @@ export const VacancyApplicationsModal = ({
             {item.status !== ApplicationStatus.ACCEPTED && (
               <Button
                 buttonText="Accept"
-                onClick={() =>
-                  handleUpdateStatus(item.id, ApplicationStatus.ACCEPTED)
-                }
+                onClick={() => setAcceptingApplication(item)}
                 disabled={isUpdating}
                 className="text-xs px-2 py-1"
                 width="fit"
@@ -259,6 +282,17 @@ export const VacancyApplicationsModal = ({
               extraDetails={selectedApplication.extra_data}
             />
 
+            <AcceptApplicationModal
+              isOpen={Boolean(acceptingApplication)}
+              onClose={() => setAcceptingApplication(null)}
+              onConfirm={handleConfirmAccept}
+              applicantName={acceptingApplication?.user?.name || 'Applicant'}
+              applicantEmail={acceptingApplication?.user?.email}
+              vacancyTitle={vacancyTitle}
+              isPending={isUpdating}
+              darkMode={isDark}
+            />
+
             <DataTable
               data={filteredApplications}
               columns={columns}
@@ -299,7 +333,10 @@ export const VacancyApplicationsModal = ({
                   ],
                 },
               ]}
-              filterValues={{ ...filterValues, status: activeApps === 'ALL' ? '' : activeApps }}
+              filterValues={{
+                ...filterValues,
+                status: activeApps === 'ALL' ? '' : activeApps,
+              }}
               onFilterChange={(key, value) => {
                 if (key === 'status') {
                   setActiveApps((value as ApplicationFilter) || 'ALL');
@@ -340,6 +377,7 @@ export const VacancyApplicationsModal = ({
                   isDark={isDark}
                   isUpdating={isUpdating}
                   onUpdateStatus={handleUpdateStatus}
+                  onAcceptClick={app => setAcceptingApplication(app)}
                 />
               )}
               page={page}
