@@ -1,13 +1,16 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Modal, Button } from '@ieee-ui/ui';
-import { FaCheckCircle } from 'react-icons/fa';
+import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
 import { stripHtmlToText } from '@/shared/utils/helpers';
 
-interface AcceptApplicationModalProps {
+export type DecisionType = 'ACCEPTED' | 'REJECTED';
+
+export interface ApplicationDecisionModalProps {
   isOpen: boolean;
   onClose: () => void;
+  decision: DecisionType;
   onConfirm: (message?: string) => Promise<void>;
   applicantName?: string;
   applicantEmail?: string;
@@ -16,9 +19,10 @@ interface AcceptApplicationModalProps {
   darkMode?: boolean;
 }
 
-export const AcceptApplicationModal: React.FC<AcceptApplicationModalProps> = ({
+export const ApplicationDecisionModal: React.FC<ApplicationDecisionModalProps> = ({
   isOpen,
   onClose,
+  decision,
   onConfirm,
   applicantName = 'Applicant',
   applicantEmail,
@@ -27,6 +31,8 @@ export const AcceptApplicationModal: React.FC<AcceptApplicationModalProps> = ({
   darkMode = false,
 }) => {
   const [message, setMessage] = useState('');
+
+  const isAccepted = decision === 'ACCEPTED';
 
   // Reset message when modal opens or closes
   useEffect(() => {
@@ -82,7 +88,7 @@ export const AcceptApplicationModal: React.FC<AcceptApplicationModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Accept Application"
+      title={isAccepted ? 'Accept Application' : 'Reject Application'}
       size="xl"
       darkMode={darkMode}
     >
@@ -90,22 +96,36 @@ export const AcceptApplicationModal: React.FC<AcceptApplicationModalProps> = ({
         {/* Applicant summary header */}
         <div
           className={`flex items-start gap-3 p-3.5 rounded-xl border ${
-            darkMode
-              ? 'bg-green-950/20 border-green-800/40 text-gray-200'
-              : 'bg-green-50/80 border-green-200 text-gray-800'
+            isAccepted
+              ? darkMode
+                ? 'bg-green-950/20 border-green-800/40 text-gray-200'
+                : 'bg-green-50/80 border-green-200 text-gray-800'
+              : darkMode
+              ? 'bg-red-950/20 border-red-800/40 text-gray-200'
+              : 'bg-red-50/80 border-red-200 text-gray-800'
           }`}
         >
           <div
             className={`p-2 rounded-full shrink-0 ${
-              darkMode
-                ? 'bg-green-900/50 text-green-400'
-                : 'bg-green-100 text-green-600'
+              isAccepted
+                ? darkMode
+                  ? 'bg-green-900/50 text-green-400'
+                  : 'bg-green-100 text-green-600'
+                : darkMode
+                ? 'bg-red-900/50 text-red-400'
+                : 'bg-red-100 text-red-600'
             }`}
           >
-            <FaCheckCircle className="w-5 h-5" />
+            {isAccepted ? (
+              <FaCheckCircle className="w-5 h-5" />
+            ) : (
+              <FaTimesCircle className="w-5 h-5" />
+            )}
           </div>
           <div className="text-sm min-w-0">
-            <p className="font-semibold text-base">Accept {applicantName}</p>
+            <p className="font-semibold text-base">
+              {isAccepted ? 'Accept' : 'Reject'} {applicantName}
+            </p>
             {vacancyTitle && (
               <p
                 className={`truncate ${
@@ -134,28 +154,35 @@ export const AcceptApplicationModal: React.FC<AcceptApplicationModalProps> = ({
               darkMode ? 'text-gray-300' : 'text-gray-700'
             }`}
           >
-            Custom Message (Optional)
+            {isAccepted
+              ? 'Custom Message (Optional)'
+              : 'Feedback / Notes from the Team (Optional)'}
           </label>
           <p
             className={`text-xs ${
               darkMode ? 'text-gray-400' : 'text-gray-600'
             }`}
           >
-            An official acceptance email will be sent automatically. You can
-            include a personalized message, onboarding instructions, or meeting links below:
+            {isAccepted
+              ? 'An official acceptance email will be sent automatically. You can include a personalized message, onboarding instructions, or meeting links below:'
+              : 'An official rejection email will be sent automatically. You can include constructive feedback, notes, or tips for the applicant below:'}
           </p>
 
           <div
-            id="acceptance-message-quill"
+            id="decision-message-quill"
             className={`react-quill-wrapper ${darkMode ? 'dark-mode-quill' : ''} [&_.ql-editor]:min-h-[140px] [&_.ql-editor]:max-h-[260px]`}
           >
             <ReactQuill
               theme="snow"
-              bounds="#acceptance-message-quill"
+              bounds="#decision-message-quill"
               modules={quillModules}
               value={message}
               onChange={setMessage}
-              placeholder="Write a personalized welcome message or onboarding instructions..."
+              placeholder={
+                isAccepted
+                  ? 'Write a personalized welcome message or onboarding instructions...'
+                  : 'Write feedback, notes, or advice for the applicant (optional)...'
+              }
               readOnly={isPending}
             />
           </div>
@@ -164,7 +191,9 @@ export const AcceptApplicationModal: React.FC<AcceptApplicationModalProps> = ({
               darkMode ? 'text-gray-400' : 'text-gray-500'
             }`}
           >
-            This message will appear formatted inside a highlighted message box in the acceptance email.
+            {isAccepted
+              ? 'This message will appear formatted inside a highlighted message box in the acceptance email.'
+              : 'These notes will appear formatted inside a highlighted "Feedback / Notes from the Team" box in the rejection email.'}
           </span>
         </div>
 
@@ -179,10 +208,18 @@ export const AcceptApplicationModal: React.FC<AcceptApplicationModalProps> = ({
             darkMode={darkMode}
           />
           <Button
-            buttonText={isPending ? 'Accepting...' : 'Accept & Send Email'}
+            buttonText={
+              isPending
+                ? isAccepted
+                  ? 'Accepting...'
+                  : 'Rejecting...'
+                : isAccepted
+                ? 'Accept & Send Email'
+                : 'Reject & Send Email'
+            }
             onClick={() => handleSubmit()}
             disabled={isPending}
-            type="primary"
+            type={isAccepted ? 'primary' : 'danger'}
             width="fit"
             darkMode={darkMode}
             className="!px-4"
@@ -192,3 +229,17 @@ export const AcceptApplicationModal: React.FC<AcceptApplicationModalProps> = ({
     </Modal>
   );
 };
+
+export interface AcceptApplicationModalProps
+  extends Omit<ApplicationDecisionModalProps, 'decision'> {}
+
+export const AcceptApplicationModal: React.FC<AcceptApplicationModalProps> = (
+  props
+) => <ApplicationDecisionModal {...props} decision="ACCEPTED" />;
+
+export interface RejectApplicationModalProps
+  extends Omit<ApplicationDecisionModalProps, 'decision'> {}
+
+export const RejectApplicationModal: React.FC<RejectApplicationModalProps> = (
+  props
+) => <ApplicationDecisionModal {...props} decision="REJECTED" />;

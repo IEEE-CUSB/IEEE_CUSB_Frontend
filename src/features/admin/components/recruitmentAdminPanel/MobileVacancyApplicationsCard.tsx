@@ -13,11 +13,19 @@ interface MobileVacancyApplicationsCardProps {
   isUpdating: boolean;
   onUpdateStatus: (id: string, data: ApplicationStatus) => void;
   onAcceptClick?: (application: Application) => void;
+  onRejectClick?: (application: Application) => void;
 }
 
 export const MobileVacancyApplicationsCard: React.FC<
   MobileVacancyApplicationsCardProps
-> = ({ application, isDark, isUpdating, onUpdateStatus, onAcceptClick }) => {
+> = ({
+  application,
+  isDark,
+  isUpdating,
+  onUpdateStatus,
+  onAcceptClick,
+  onRejectClick,
+}) => {
   const statusColors: Record<ApplicationStatus, string> = {
     [ApplicationStatus.ACCEPTED]: isDark
       ? 'bg-green-900/30 text-green-300'
@@ -97,7 +105,9 @@ export const MobileVacancyApplicationsCard: React.FC<
           <Button
             buttonText="Reject"
             onClick={() =>
-              onUpdateStatus(application.id, ApplicationStatus.REJECTED)
+              onRejectClick
+                ? onRejectClick(application)
+                : onUpdateStatus(application.id, ApplicationStatus.REJECTED)
             }
             disabled={isUpdating}
             className="text-xs px-3 py-1.5 h-auto min-h-0 bg-red-50 hover:bg-red-100 text-red-600 border-red-200"

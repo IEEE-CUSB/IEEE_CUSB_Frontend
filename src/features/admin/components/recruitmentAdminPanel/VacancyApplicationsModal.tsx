@@ -11,7 +11,7 @@ import {
 import { FaUser } from 'react-icons/fa';
 import { useTheme } from '@/shared/hooks/useTheme';
 import { MobileVacancyApplicationsCard } from './MobileVacancyApplicationsCard';
-import { AcceptApplicationModal } from './AcceptApplicationModal';
+import { ApplicationDecisionModal } from './ApplicationDecisionModal';
 import {
   Application,
   ApplicationStatus,
@@ -105,8 +105,10 @@ export const VacancyApplicationsModal = ({
 
   const filteredApplications = getFilteredApplications();
 
-  const [acceptingApplication, setAcceptingApplication] =
-    useState<Application | null>(null);
+  const [decisionModal, setDecisionModal] = useState<{
+    application: Application;
+    type: 'ACCEPTED' | 'REJECTED';
+  } | null>(null);
 
   const handleUpdateStatus = async (
     applicationId: string,
@@ -119,15 +121,17 @@ export const VacancyApplicationsModal = ({
     });
   };
 
-  const handleConfirmAccept = async (message?: string) => {
-    if (!acceptingApplication) return;
+  const handleConfirmDecision = async (message?: string) => {
+    if (!decisionModal) return;
     try {
       await handleUpdateStatus(
-        acceptingApplication.id,
-        ApplicationStatus.ACCEPTED,
+        decisionModal.application.id,
+        decisionModal.type === 'ACCEPTED'
+          ? ApplicationStatus.ACCEPTED
+          : ApplicationStatus.REJECTED,
         message
       );
-      setAcceptingApplication(null);
+      setDecisionModal(null);
     } catch {
       // Error handled by mutation toast
     }
@@ -218,7 +222,12 @@ export const VacancyApplicationsModal = ({
             {item.status !== ApplicationStatus.ACCEPTED && (
               <Button
                 buttonText="Accept"
-                onClick={() => setAcceptingApplication(item)}
+                onClick={() =>
+                  setDecisionModal({
+                    application: item,
+                    type: 'ACCEPTED',
+                  })
+                }
                 disabled={isUpdating}
                 className="text-xs px-2 py-1"
                 width="fit"
@@ -230,7 +239,10 @@ export const VacancyApplicationsModal = ({
               <Button
                 buttonText="Reject"
                 onClick={() =>
-                  handleUpdateStatus(item.id, ApplicationStatus.REJECTED)
+                  setDecisionModal({
+                    application: item,
+                    type: 'REJECTED',
+                  })
                 }
                 disabled={isUpdating}
                 className="text-xs px-2 py-1 bg-red-50 hover:bg-red-100 text-red-600 border-red-200"
@@ -282,12 +294,13 @@ export const VacancyApplicationsModal = ({
               extraDetails={selectedApplication.extra_data}
             />
 
-            <AcceptApplicationModal
-              isOpen={Boolean(acceptingApplication)}
-              onClose={() => setAcceptingApplication(null)}
-              onConfirm={handleConfirmAccept}
-              applicantName={acceptingApplication?.user?.name || 'Applicant'}
-              applicantEmail={acceptingApplication?.user?.email}
+            <ApplicationDecisionModal
+              isOpen={Boolean(decisionModal)}
+              onClose={() => setDecisionModal(null)}
+              decision={decisionModal?.type || 'ACCEPTED'}
+              onConfirm={handleConfirmDecision}
+              applicantName={decisionModal?.application?.user?.name || 'Applicant'}
+              applicantEmail={decisionModal?.application?.user?.email}
               vacancyTitle={vacancyTitle}
               isPending={isUpdating}
               darkMode={isDark}
@@ -377,7 +390,12 @@ export const VacancyApplicationsModal = ({
                   isDark={isDark}
                   isUpdating={isUpdating}
                   onUpdateStatus={handleUpdateStatus}
-                  onAcceptClick={app => setAcceptingApplication(app)}
+                  onAcceptClick={app =>
+                    setDecisionModal({ application: app, type: 'ACCEPTED' })
+                  }
+                  onRejectClick={app =>
+                    setDecisionModal({ application: app, type: 'REJECTED' })
+                  }
                 />
               )}
               page={page}
