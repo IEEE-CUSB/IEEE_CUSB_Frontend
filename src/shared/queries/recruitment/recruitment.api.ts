@@ -224,3 +224,20 @@ export const getVacancyById = async (id: string): Promise<Vacancy> => {
   );
   return response.data.data;
 };
+
+export const createApplicationsShare = async (vacancyId: string): Promise<{ token: string; expiresInDays: number }> => {
+  const response = await apiClient.post<ApiResponse<{ token: string; expiresInDays: number }>>(
+    `/admin/recruitment/vacancies/${vacancyId}/applications/share`
+  );
+  return response.data.data;
+};
+
+export const getSharedApplications = async (token: string) => {
+  const response = await apiClient.get<ApiResponse<any>>(`/recruitment/shared-applications/${token}`);
+  return response.data.data;
+};
+
+export const getSharedApplicationCv = async (token: string, applicationId: string): Promise<Blob> => {
+  const response = await apiClient.get<Blob>(`/recruitment/shared-applications/${token}/${applicationId}/cv`, { responseType: 'blob' });
+  return response.data;
+};

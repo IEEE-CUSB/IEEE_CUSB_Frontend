@@ -22,6 +22,8 @@ import {
 } from '@/shared/queries/recruitment/recruitment.queries';
 import { useDebounce } from '@/shared/hooks/useDebounce';
 import UniversityList from '@/constants/universityList';
+import toast from 'react-hot-toast';
+import { createApplicationsShare } from '@/shared/queries/recruitment/recruitment.api';
 
 import UserInfo from '../shared/UserInfo';
 
@@ -49,6 +51,7 @@ export const VacancyApplicationsModal = ({
   const [filterValues, setFilterValues] = useState<Record<string, string>>({});
   const [menuOpen, setMenuOpen] = useState(false);
   const [search, setSearch] = useState('');
+  const [sharing, setSharing] = useState(false);
   const debouncedSearch = useDebounce(search, 300);
 
   const searchType = filterValues.searchBy || 'name';
@@ -147,6 +150,20 @@ export const VacancyApplicationsModal = ({
   const handleUserInfoClick = (application: Application) => {
     setSelectedApplication(application);
     setMenuOpen(true);
+  };
+
+  const handleShare = async () => {
+    setSharing(true);
+    try {
+      const { token, expiresInDays } = await createApplicationsShare(vacancyId);
+      const shareUrl = `${window.location.origin}/shared/applications/${token}`;
+      await navigator.clipboard.writeText(shareUrl);
+      toast.success(`Read-only link copied. It expires in ${expiresInDays} days.`);
+    } catch {
+      toast.error('Could not create or copy the share link.');
+    } finally {
+      setSharing(false);
+    }
   };
 
   const columns = useMemo<ColumnDef<Application>[]>(
@@ -278,6 +295,9 @@ export const VacancyApplicationsModal = ({
       darkMode={isDark}
     >
       <div className="space-y-4">
+        <div className="flex justify-end">
+          <Button buttonText={sharing ? 'Creating link…' : 'Copy read-only share link'} onClick={handleShare} disabled={sharing} width="fit" darkMode={isDark} type="basic" />
+        </div>
         {isError ? (
           <ErrorScreen
             title="Failed to load applications"

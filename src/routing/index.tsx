@@ -22,11 +22,12 @@ import { AdminLayout } from '../features/admin/layouts/AdminLayout';
 // import { AwardsPage as AdminAwardsPage } from './pages/admin/AwardsPage';
 // import { AdminWorkshopsPage } from './pages/admin/WorkshopsPage';
 import { RecruitmentPage as AdminRecruitmentPage } from './pages/admin/RecruitmentPage';
-// import { UsersPage as AdminUsersPage } from './pages/admin/UsersPage';
+import { UsersPage as AdminUsersPage } from './pages/admin/UsersPage';
 import { RoleName } from '@/shared/types/auth.types';
 import { WorkshopsPage } from './pages/WorkshopsPage';
 import { WorkshopDetailsPage } from './pages/WorkshopDetailsPage';
 import { ProfilePage } from './pages/ProfilePage';
+import SharedApplicationsPage from './pages/SharedApplicationsPage';
 /**
  * Application Routes Configuration
  * Using React Router v6 Data APIs (createBrowserRouter)
@@ -78,7 +79,7 @@ const routes: RouteObject[] = [
       },
       {
         path: 'users',
-        element: <UnderConstructionPage />, // Users - Under Construction
+        element: <AdminUsersPage />, // Users - Under Construction
       },
       {
         path: 'recruitment',
@@ -125,6 +126,10 @@ const routes: RouteObject[] = [
       {
         path: 'v/:id',
         element: <VacancyDetailsPage />,
+      },
+      {
+        path: 'shared/applications/:token',
+        element: <SharedApplicationsPage />,
       },
       // TODO: Legacy recruitment/vacancies/:id route kept for backward compatibility (users with old copied URLs). Remove this route later.
       {
