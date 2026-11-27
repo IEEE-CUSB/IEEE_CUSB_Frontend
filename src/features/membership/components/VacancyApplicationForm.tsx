@@ -6,6 +6,7 @@ import { useApplyToVacancy } from '@/shared/queries/recruitment';
 import { uploadApplicationFile } from '@/shared/queries/recruitment/recruitment.api';
 import { toast } from 'react-hot-toast';
 import { InputField, TextArea, Select, Button } from '@ieee-ui/ui';
+import { RecruitmentHelpNote } from '@/shared/components/RecruitmentHelpNote';
 
 interface VacancyApplicationFormProps {
   vacancy: Vacancy;
@@ -15,7 +16,7 @@ interface VacancyApplicationFormProps {
   hasApplied?: boolean;
 }
 
-export const VacancyApplicationForm = ({ vacancy, isDark, onSuccess, onCancel, hasApplied }: VacancyApplicationFormProps) => {
+const VacancyApplicationFormContent = ({ vacancy, isDark, onSuccess, onCancel, hasApplied }: VacancyApplicationFormProps) => {
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
   const isAdmin = user?.role?.name === 'Admin' || user?.role?.name === 'Super Admin';
@@ -273,3 +274,10 @@ export const VacancyApplicationForm = ({ vacancy, isDark, onSuccess, onCancel, h
     </form>
   );
 };
+
+export const VacancyApplicationForm = (props: VacancyApplicationFormProps) => (
+  <>
+    <VacancyApplicationFormContent {...props} />
+    <RecruitmentHelpNote isDark={props.isDark} />
+  </>
+);
