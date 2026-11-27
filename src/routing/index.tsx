@@ -17,10 +17,10 @@ import {
 } from './pages';
 import EventsPage from './pages/EventsPage';
 import { AdminLayout } from '../features/admin/layouts/AdminLayout';
-// import { EventsPage as AdminEventsPage } from './pages/admin/EventsPage';
-// import { CommitteesPage as AdminCommittees } from './pages/admin/CommitteesPage';
-// import { AwardsPage as AdminAwardsPage } from './pages/admin/AwardsPage';
-// import { AdminWorkshopsPage } from './pages/admin/WorkshopsPage';
+import { EventsPage as AdminEventsPage } from './pages/admin/EventsPage';
+import { CommitteesPage as AdminCommittees } from './pages/admin/CommitteesPage';
+import { AwardsPage as AdminAwardsPage } from './pages/admin/AwardsPage';
+import { AdminWorkshopsPage } from './pages/admin/WorkshopsPage';
 import { RecruitmentPage as AdminRecruitmentPage } from './pages/admin/RecruitmentPage';
 import { UsersPage as AdminUsersPage } from './pages/admin/UsersPage';
 import { RoleName } from '@/shared/types/auth.types';
@@ -63,19 +63,19 @@ const routes: RouteObject[] = [
       },
       {
         path: 'events',
-        element: <UnderConstructionPage />, // Events - Working
+        element: <AdminEventsPage />, // Events - Working
       },
       {
         path: 'committees',
-        element: <UnderConstructionPage />, // Committees & Board Management
+        element: <AdminCommittees />, // Committees & Board Management
       },
       {
         path: 'awards',
-        element: <UnderConstructionPage />, // Awards - Working
+        element: <AdminAwardsPage />, // Awards - Working
       },
       {
         path: 'workshops',
-        element: <UnderConstructionPage />, // Workshops - Working
+        element: <AdminWorkshopsPage />, // Workshops - Working
       },
       {
         path: 'users',
