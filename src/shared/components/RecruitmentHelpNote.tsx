@@ -2,6 +2,14 @@ import { FaEnvelope } from 'react-icons/fa';
 
 export const RECRUITMENT_SUPPORT_EMAIL = 'it@ieeecusb.org';
 
+const SOCIAL_LINKS = {
+  facebook: 'https://www.facebook.com/IEEECUSB/',
+  linkedin: 'https://www.linkedin.com/company/ieeecusb/',
+};
+
+const LINK_CLASS =
+  'font-semibold text-blue-600 hover:underline dark:text-blue-400';
+
 interface RecruitmentHelpNoteProps {
   isDark: boolean;
 }
@@ -19,9 +27,27 @@ export const RecruitmentHelpNote = ({ isDark }: RecruitmentHelpNoteProps) => (
       If you have any problem with the recruitment, please{' '}
       <a
         href={`mailto:${RECRUITMENT_SUPPORT_EMAIL}`}
-        className="font-semibold text-blue-600 hover:underline dark:text-blue-400"
+        className={LINK_CLASS}
       >
         email us at {RECRUITMENT_SUPPORT_EMAIL}
+      </a>{' '}
+      or contact us on{' '}
+      <a
+        href={SOCIAL_LINKS.facebook}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={LINK_CLASS}
+      >
+        Facebook
+      </a>{' '}
+      or{' '}
+      <a
+        href={SOCIAL_LINKS.linkedin}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={LINK_CLASS}
+      >
+        LinkedIn
       </a>
       .
     </p>
