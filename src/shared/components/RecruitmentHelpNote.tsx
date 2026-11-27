@@ -1,7 +1,6 @@
-import { FaWhatsapp } from 'react-icons/fa';
+import { FaEnvelope } from 'react-icons/fa';
 
-export const RECRUITMENT_SUPPORT_WHATSAPP_URL =
-  'https://wa.me/201552851443';
+export const RECRUITMENT_SUPPORT_EMAIL = 'it@ieeecusb.org';
 
 interface RecruitmentHelpNoteProps {
   isDark: boolean;
@@ -15,16 +14,14 @@ export const RecruitmentHelpNote = ({ isDark }: RecruitmentHelpNoteProps) => (
         : 'border-gray-200 bg-gray-50 text-gray-600'
     }`}
   >
-    <FaWhatsapp className="mt-0.5 h-5 w-5 shrink-0 text-green-500" />
+    <FaEnvelope className="mt-0.5 h-5 w-5 shrink-0 text-blue-500" />
     <p className="text-sm">
       If you have any problem with the recruitment, please{' '}
       <a
-        href={RECRUITMENT_SUPPORT_WHATSAPP_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="font-semibold text-green-600 hover:underline dark:text-green-400"
+        href={`mailto:${RECRUITMENT_SUPPORT_EMAIL}`}
+        className="font-semibold text-blue-600 hover:underline dark:text-blue-400"
       >
-        contact us on WhatsApp
+        email us at {RECRUITMENT_SUPPORT_EMAIL}
       </a>
       .
     </p>
